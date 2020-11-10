@@ -79,7 +79,7 @@ class Box2DSim(object):
         pid = self.joint_pids[joint_name]
         pid.setpoint = angle
 
-    def move_body(self, speed, angle):
+    def move_body(self, angle, speed):
         """ Move the robot
 
         Must have a "body" object
@@ -89,10 +89,19 @@ class Box2DSim(object):
             angle (float): moving angle
             speed (float): speed
         """
-        self.bodies["body"].ApplyForce([speed*np.cos(angle),
-                                        speed*np.sin(angle)],
-                                       self.bodies["body"].localCenter - (0, 2),
-                                       wake=True)
+
+        body = self.bodies["body"]
+
+        body.angle += angle
+        #body.angle = np.maximum(0.3*np.pi, body.angle)
+        #body.angle = np.minimum(-0.3*np.pi, body.angle)
+        curr_angle = body.angle
+        body.linearVelocity = -speed*np.array(
+            [np.cos(curr_angle+np.pi/2), np.sin(curr_angle+np.pi/2)])
+        body.transform = (body.position, curr_angle)
+
+        pid = self.joint_pids["body_to_head"]
+        pid.setpoint = 10*angle
 
     def step(self):
         """ A simulation step
@@ -114,7 +123,7 @@ class TestPlotter:
 
     """
 
-    def __init__(self, env, xlim=[-10, 30], ylim=[-10, 30],
+    def __init__(self, env, xlim=[-5, 5], ylim=[-6, 3],
                  figsize=None, offline=False):
         """
         Args:

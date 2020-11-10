@@ -65,8 +65,8 @@ class Box2DSimRatEnv(gym.Env):
         self.renderer = None
         self.renderer_figsize = (3, 3)
 
-        self.taskspace_xlim = [-15, 15]
-        self.taskspace_ylim = [-16, 13]
+        self.taskspace_xlim = [-5, 5]
+        self.taskspace_ylim = [-6, 3]
 
         self.set_reward_fun()
 
@@ -112,7 +112,7 @@ class Box2DSimRatEnv(gym.Env):
             self.sim.move(joint, action[j])
 
         direction = action[-2]
-        speed = -(action[-1] + np.pi/2)
+        speed = action[-1]
         self.sim.move_body(direction, speed)
         self.sim.step()
 
