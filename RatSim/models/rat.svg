@@ -24,15 +24,15 @@
      inkscape:pageopacity="0.0"
      inkscape:pageshadow="2"
      inkscape:zoom="1.9059356"
-     inkscape:cx="301.65334"
-     inkscape:cy="447.59004"
+     inkscape:cx="338.90539"
+     inkscape:cy="442.86795"
      inkscape:document-units="mm"
      inkscape:current-layer="layer1"
      inkscape:document-rotation="0"
      showgrid="false"
      units="px"
-     inkscape:window-width="1373"
-     inkscape:window-height="755"
+     inkscape:window-width="1853"
+     inkscape:window-height="1145"
      inkscape:window-x="67"
      inkscape:window-y="27"
      inkscape:window-maximized="1"
@@ -115,49 +115,51 @@
     </g>
     <circle
        style="fill:#fffffc;stroke:#d25800;stroke-width:0.3175;stop-color:#000000"
-       id="path25"
+       id="head_to_wl1"
        cx="120.93545"
        cy="64.829971"
-       r="1.2496321" />
+       r="1.2496321"
+       inkscape:label="#head_to_wl1" />
     <circle
        style="fill:#fffffc;stroke:#d25800;stroke-width:0.3175;stop-color:#000000"
-       id="circle27"
+       id="head_to_wl2"
        cx="122.52293"
        cy="61.125801"
        r="1.2496321" />
     <circle
        style="fill:#fffffc;stroke:#d25800;stroke-width:0.3175;stop-color:#000000"
-       id="circle29"
+       id="head_to_wl3"
        cx="123.58126"
        cy="59.5383"
        r="1.2496321" />
     <circle
        style="fill:#fffffc;stroke:#d25800;stroke-width:0.3175;stop-color:#000000"
-       id="circle31"
+       id="head_to_wr1"
        cx="-136.81032"
        cy="64.829971"
        r="1.2496321"
        transform="scale(-1,1)" />
     <circle
        style="fill:#fffffc;stroke:#d25800;stroke-width:0.3175;stop-color:#000000"
-       id="circle33"
+       id="head_to_wr2"
        cx="-135.22285"
        cy="61.125801"
        r="1.2496321"
        transform="scale(-1,1)" />
     <circle
        style="fill:#fffffc;stroke:#d25800;stroke-width:0.3175;stop-color:#000000"
-       id="circle35"
+       id="head_to_wr3"
        cx="-134.16452"
        cy="59.5383"
        r="1.2496321"
        transform="scale(-1,1)" />
     <circle
        style="fill:#fffffc;stroke:#d25800;stroke-width:0.3175;stop-color:#000000"
-       id="circle37"
+       id="body_to_head"
        cx="-129.40196"
        cy="114.04245"
        r="1.2496321"
-       transform="scale(-1,1)" />
+       transform="scale(-1,1)"
+       inkscape:label="#body_to_head" />
   </g>
 </svg>

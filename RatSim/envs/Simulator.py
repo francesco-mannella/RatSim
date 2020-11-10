@@ -23,7 +23,7 @@ class Box2DSim(object):
         return jsw
 
     def __init__(self, world_file=None, world_dict=None, dt=1/80.0,
-    vel_iters=30, pos_iters=2):
+                 vel_iters=30, pos_iters=2):
         """
         Args:
 
@@ -78,6 +78,21 @@ class Box2DSim(object):
         """
         pid = self.joint_pids[joint_name]
         pid.setpoint = angle
+
+    def move_body(self, speed, angle):
+        """ Move the robot
+
+        Must have a "body" object
+
+        Args:
+
+            angle (float): moving angle
+            speed (float): speed
+        """
+        self.bodies["body"].ApplyForce([speed*np.cos(angle),
+                                        speed*np.sin(angle)],
+                                       self.bodies["body"].localCenter - (0, 2),
+                                       wake=True)
 
     def step(self):
         """ A simulation step

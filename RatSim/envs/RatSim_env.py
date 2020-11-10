@@ -17,7 +17,8 @@ class Box2DSimRatEnv(gym.Env):
     metadata = {'render.modes': ['human', 'offline']}
     robot_parts_names = ["body", "head", "wl1", "wl2", "wl3", "wr1",
                          "wr2", "wr3"]
-    joint_names = []
+    joint_names = ["head_to_wl1", "head_to_wl2", "head_to_wl3", "head_to_wr1",
+                   "head_to_wr2", "head_to_wr3", "body_to_head"]
     sensors_names = []
 
     def __init__(self):
@@ -29,7 +30,8 @@ class Box2DSimRatEnv(gym.Env):
         self.init_worlds()
 
         self.init_worlds()
-        self.num_joints = 6
+        self.num_joints = 7
+        self.num_move_degrees = 2
         self.num_touch_sensors = 6
         self.random_mean = np.array([0, 0])
         self.random_std = 5
@@ -38,7 +40,11 @@ class Box2DSimRatEnv(gym.Env):
         # They must be gym.spaces objects
         # Example when using discrete actions:
         self.action_space = spaces.Box(
-            -np.pi, np.pi, [self.num_joints], dtype=float)
+            np.hstack([-np.pi, -np.pi, -np.pi, -np.pi, -np.pi,
+             -np.pi, -np.pi, -np.pi, 0.0]),
+            np.hstack([np.pi,  np.pi, np.pi,  np.pi,  np.pi,
+             np.pi,  np.pi, np.pi, 1000000.0]),
+            [self.num_joints + self.num_move_degrees], dtype=float)
 
         self.observation_space = gym.spaces.Dict({
             "JOINT_POSITIONS": gym.spaces.Box(
@@ -59,10 +65,8 @@ class Box2DSimRatEnv(gym.Env):
         self.renderer = None
         self.renderer_figsize = (3, 3)
 
-        #self.taskspace_xlim = [0, 10]
-        #self.taskspace_ylim = [0, 6]
-        self.taskspace_xlim = [-5, 5]
-        self.taskspace_ylim = [-6, 3]
+        self.taskspace_xlim = [-15, 15]
+        self.taskspace_ylim = [-16, 13]
 
         self.set_reward_fun()
 
@@ -101,11 +105,15 @@ class Box2DSimRatEnv(gym.Env):
 
     def set_action(self, action):
 
-        assert(len(action) == self.num_joints)
+        assert(len(action) == self.num_joints + self.num_move_degrees)
         action = np.hstack(action)
         # do action
         for j, joint in enumerate(self.joint_names):
             self.sim.move(joint, action[j])
+
+        direction = action[-2]
+        speed = -(action[-1] + np.pi/2)
+        self.sim.move_body(direction, speed)
         self.sim.step()
 
     def get_observation(self):
@@ -159,7 +167,7 @@ class Box2DSimRatEnv(gym.Env):
         if self.renderer is not None:
             self.renderer.reset()
 
-        return self.sim_step(np.zeros(self.num_joints))
+        return self.sim_step(np.zeros(self.num_joints + self.num_move_degrees))
 
     def render(self, mode='human'):
 
