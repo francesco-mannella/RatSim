@@ -16,7 +16,7 @@ s = 0.0015
 angle, speed = np.array([np.vstack([[p, a]])*normal(t, m, s).reshape(-1, 1)
                          for p, a, m
                          in zip(np.random.uniform(-.04, .04, 100),
-                                np.random.uniform(-5, 5, 100),
+                                np.random.uniform(-6, 6, 100),
                                 np.random.rand(100))]).sum(0).T
 
 # %%
