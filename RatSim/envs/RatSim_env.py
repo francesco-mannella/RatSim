@@ -41,9 +41,9 @@ class Box2DSimRatEnv(gym.Env):
         # Example when using discrete actions:
         self.action_space = spaces.Box(
             np.hstack([-np.pi, -np.pi, -np.pi, -np.pi, -np.pi,
-             -np.pi, -np.pi, -np.pi, 0.0]),
+             -np.pi, -np.pi, -0.01, -20.0]),
             np.hstack([np.pi,  np.pi, np.pi,  np.pi,  np.pi,
-             np.pi,  np.pi, np.pi, 1000000.0]),
+             np.pi,  np.pi, 0.01, 20.0]),
             [self.num_joints + self.num_move_degrees], dtype=float)
 
         self.observation_space = gym.spaces.Dict({
