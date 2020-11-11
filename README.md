@@ -1,4 +1,4 @@
-# Box2DSim
+# RatSim
 
 A simple rat simulation with whiskers using  [gym](http://gym.openai.com/) environment and [pybox2d](https://github.com/pybox2d/pybox2d/wiki/manual) as the physics engine and [matplotlib](https://matplotlib.org/) for graphics.
 
