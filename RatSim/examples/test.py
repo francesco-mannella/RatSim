@@ -1,56 +1,26 @@
-import matplotlib.pyplot as plt
-import numpy as np
-from scipy import interpolate
 import gym
 import RatSim
 
-rng = np.random.RandomState(4)
-
-def normal(x, m, s):
-    return np.exp(-0.5*(s**-2)*(x - m)**2)
-
+import numpy as np
+rng = np.random.RandomState(2)
 
 env = gym.make('RatSim-v0')
+action = np.array(
+    [1.0*0.45*np.pi,   # head_to_wl1 amp
+     0.5*0.45*np.pi,   # head_to_wl2 amp
+     0.5*0.45*np.pi,   # head_to_wl3 amp
+     1.0*0.45*np.pi,   # head_to_wr1 amp
+     0.5*0.45*np.pi,   # head_to_wr2 amp
+     0.5*0.45*np.pi,   # head_to_wr3 amp
+     0.0,   # body_to_head angle
+     0,     # angular velocity
+     0])     # linear velocity
 
-stime = 500
+for t in range(300):
 
-t = np.linspace(0, 1, stime)
-s = 0.005
-peaks_num = 20
-peaks = rng.uniform(0, 1, peaks_num)
-amplitudes = rng.uniform(-13, 15, peaks_num)
-angles = rng.uniform(-.04, .04, peaks_num)
-
-angles, speeds = np.array([[[angle, ampl]]*normal(t, mean, s).reshape(-1, 1)
-                         for angle, ampl, mean
-                         in zip(angles, amplitudes, peaks)]).sum(0).T
-
-fig = plt.figure(figsize=(10, 6))
-ax1 = fig.add_subplot(211)
-ax1.set_title("Linear velocity in time")
-ax1.set_xticks([])
-splot, = ax1.plot(t, speeds, alpha=0.5, lw=4)
-ax2 = fig.add_subplot(212)
-ax2.set_title("Direction in time")
-aplot, = ax2.plot(t, angles, alpha=0.5,lw=4)
-
-plt.show()
-# %%
-action = np.zeros(9)
-for t in range(stime):
     env.render("offline")
 
-    # whisker joints
-    amplitudes = np.array([1.7, 1.3, 0.6, 1.7, 1.3, 0.6])
-    action[:6] = 0.2*np.pi*np.sin(100*np.pi*t/5000)*amplitudes
+    action[-2] += 0.2*(0.04*rng.randn() - action[-2])   # random angular velocity
+    action[-1] += 0.2*(10*rng.randn() - action[-1])  # randomlinear velocity
 
-    # left whiskers have inverted joints
-    action[:3] = - action[:3]
-
-    # rotation velocity
-    action[-2] = angles[t]
-
-    # linear velocity
-    action[-1] = speeds[t]
-
-    env.step(action)
+    observation = env.step(action)

@@ -19,7 +19,7 @@ A simple rat simulation with whiskers using  [gym](http://gym.openai.com/) envir
 
 ## Basic usage
 
-### One-arm scenario
+### Wall scenario
 
     import gym
     import RatSim
@@ -39,35 +39,37 @@ The two possible values of the argument to be passed to env.render() are:
 <table>
        <tr>
               <td align="center">
-                     <img src="docs/pics/sim.gif" alt="one_arm_scenario" width="100%">
+                     <img src="docs/pics/rat.gif" alt="one_arm_scenario" width="100%">
              </td>
        </tr>
        <tr>
               <td align="center">
-                     Example in <a href="box2dsim/examples/test.py">test.py</a>
+                     Example in <a href="RatSim/examples/test.py">test.py</a>
               </td>
        </tr>
 </table>
 
 #### Actions
 
-The action attribute of env.step must be a vector of 7 joint positions in radiants. The first 7 joints have a range between -Pi/2 and +Pi/2. The two gripper joints have a range between 0 and +Pi/2. They are also coupled so that the second joint will be at most twice the angle of the first one.
+The action attribute of env.step must be a vector of 9 float elements. Elements in the first 6 indices give the current amplitude of oscillation for each of the 6 whiskers. the 7th index defines the current joint angle of the body-to-head joint. the 8th index defines the angular velocity of the rat. The 9th index defines the speed in the current straight direction.
+
 
 <TABLE width="100%" BORDER="0">
 <TR>
 <TD>
 
-| index |  joint name               |
-| ----- | ------------------------- |
-|  0    |  Ground_to_Arm1           |
-|  1    |  Arm1_to_Arm2             |
-|  2    |  Arm2_to_Arm3             |
-|  3    |  Arm3_to_Claw20           |
-|  4    |  Claw20_to_Claw21         |
-
+| index |  joint name            |
+| ----- | ---------------------- |
+|  0    |  head_to_wl1           |
+|  1    |  head_to_wl2           |
+|  2    |  head_to_wl3           |
+|  3    |  head_to_wr1           |
+|  4    |  head_to_wr2           |
+|  5    |  head_to_wr3           |
+|  6    |  body_To_head          |
 
 </TD>
-<TD><img src="docs/pics/one_arm_scenario.png" alt="one_arm_scenario" width="100%"></TD>
+<TD><img src="docs/pics/rat_description.png" alt="one_arm_scenario" width="100%"></TD>
 </TR>
 </TABLE>
 
@@ -75,9 +77,9 @@ The action attribute of env.step must be a vector of 7 joint positions in radian
 
 The observation object returned by env.step is a dictionary:
 
-* observation["JOINT_POSITIONS"] is a vector containing the current angles of the 7:w
+* observation["JOINT_POSITIONS"] is a vector containing the current angles of the 7
  joints
-* observation["TOUCH_SENSORS"] is a vector containing the current touch intensity at the four touch sensors (see figure below)
+* observation["TOUCH_SENSORS"] is a vector containing the current touch intensity at the six touch sensors (see figure below)
 * observation["OBJ_POSITION"] coordinates of the center of mass of the external object
 
 #### Reward

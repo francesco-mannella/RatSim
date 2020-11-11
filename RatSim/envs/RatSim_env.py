@@ -35,15 +35,15 @@ class Box2DSimRatEnv(gym.Env):
         self.num_touch_sensors = 6
         self.random_mean = np.array([0, 0])
         self.random_std = 5
+        self.dt_clock = 0.1
 
         # Define action and observation space
         # They must be gym.spaces objects
         # Example when using discrete actions:
         self.action_space = spaces.Box(
-            np.hstack([-np.pi, -np.pi, -np.pi, -np.pi, -np.pi,
-             -np.pi, -np.pi, -0.01, -20.0]),
+            np.hstack([0., 0., 0., 0., 0., 0., -np.pi, -0.01, -20.0]),
             np.hstack([np.pi,  np.pi, np.pi,  np.pi,  np.pi,
-             np.pi,  np.pi, 0.01, 20.0]),
+                       np.pi,  np.pi, 0.01, 20.0]),
             [self.num_joints + self.num_move_degrees], dtype=float)
 
         self.observation_space = gym.spaces.Dict({
@@ -90,6 +90,7 @@ class Box2DSimRatEnv(gym.Env):
 
         world_dict = Sim.loadWorldJson(self.world_file)
         self.sim = Sim(world_dict=world_dict)
+        self.clock = 0
 
     def set_seed(self, seed=None):
         self.seed = seed
@@ -107,9 +108,14 @@ class Box2DSimRatEnv(gym.Env):
 
         assert(len(action) == self.num_joints + self.num_move_degrees)
         action = np.hstack(action)
+
+        angles = action*np.sin(self.clock*self.dt_clock)
+        angles[:3] = - angles[:3]
         # do action
         for j, joint in enumerate(self.joint_names):
-            self.sim.move(joint, action[j])
+            self.sim.move(joint, angles[j])
+
+        self.clock += 1
 
         direction = action[-2]
         speed = action[-1]
