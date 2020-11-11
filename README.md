@@ -69,7 +69,7 @@ The action attribute of env.step must be a vector of 9 float elements. Elements 
 |  6    |  body_To_head          |
 
 </TD>
-<TD><img src="docs/pics/rat_description.png" alt="one_arm_scenario" width="100%"></TD>
+<TD><img src="docs/pics/rat_description.svg" alt="one_arm_scenario" width="100%"></TD>
 </TR>
 </TABLE>
 
