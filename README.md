@@ -10,7 +10,7 @@ A simple rat simulation with whiskers using  [gym](http://gym.openai.com/) envir
 
 1. Download the RatSim repo:
 
-       git clone https://github.com/ratsim.git
+       git clone https://github.com/francesco-mannella/RatSim.git
 
 2. Install the RatSim package:
 
