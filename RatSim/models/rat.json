@@ -24,7 +24,7 @@
             "fixture": [
                 {
                     "density": 400,
-                    "group_index": 0,
+                    "group_index": 1,
                     "polygon": {
                         "vertices": {
                             "x": [

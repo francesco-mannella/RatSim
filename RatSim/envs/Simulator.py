@@ -101,7 +101,7 @@ class Box2DSim(object):
         body.transform = (body.position, curr_angle)
 
         pid = self.joint_pids["body_to_head"]
-        pid.setpoint = 10*angle
+        pid.setpoint += 10*angle
 
     def step(self):
         """ A simulation step
