@@ -59,11 +59,12 @@ class Box2DSim(object):
 
             (int): number of contacts
         """
+        
 
         contacts = 0
         for ce in self.bodies[bodyA].contacts:
             if ce.contact.touching is True:
-                if ce.contact.fixtureB.body == self.bodies[bodyB]:
+                if ce.contact.fixtureA.body == self.bodies[bodyB]:
                     contacts += 1
         return contacts
 

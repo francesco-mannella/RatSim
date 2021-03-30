@@ -53,6 +53,6 @@ for t in range(stime):
     action[-1] = speeds[t]
 
     state, *_ = env.step(action)
-    if np.sum(state["TOUCH_SENSORS"]):
-        print(state["TOUCH_SENSORS"])
+    
+    print(state["TOUCH_SENSORS"])
 
