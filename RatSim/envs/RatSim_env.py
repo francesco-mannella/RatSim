@@ -52,11 +52,9 @@ class Box2DSimRatEnv(gym.Env):
                 -np.inf, np.inf,
                 [self.num_joints],
                 dtype=float),
-            "TOUCH_SENSORS": gym.spaces.Dict(
-                {obj_name: gym.spaces.Box(0, np.inf,
+            "TOUCH_SENSORS":gym.spaces.Box(0, np.inf,
                                           [self.num_touch_sensors],
-                                          dtype=float)
-                 for obj_name in self.object_names}),
+                                          dtype=float),
             "OSCILLATOR": gym.spaces.Box(-np.pi, np.pi, [1], dtype=float),
             "OBJ_POSITION": gym.spaces.Box(
                 -np.inf, np.inf,
