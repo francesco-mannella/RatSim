@@ -19,7 +19,7 @@ class Box2DSimRatEnv(gym.Env):
                          "wr2", "wr3"]
     joint_names = ["head_to_wl1", "head_to_wl2", "head_to_wl3", "head_to_wr1",
                    "head_to_wr2", "head_to_wr3", "body_to_head"]
-    sensors_names = []
+    sensors_names = ["wl1", "wl2", "wl3", "wr1","wr2", "wr3"]
 
     def __init__(self):
 
@@ -41,10 +41,11 @@ class Box2DSimRatEnv(gym.Env):
         # They must be gym.spaces objects
         # Example when using discrete actions:
         self.action_space = spaces.Box(
-            np.hstack([0., 0., 0., 0., 0., 0., -np.pi, -0.01, -20.0]),
-            np.hstack([np.pi,  np.pi, np.pi,  np.pi,  np.pi,
-                       np.pi,  np.pi, 0.01, 20.0]),
-            [self.num_joints + self.num_move_degrees], dtype=float)
+            np.hstack([np.zeros(self.num_joints),
+                -np.ones(self.num_joints)*np.pi, -0.01, -20.0]),
+            np.hstack([np.ones(self.num_joints)*np.pi, 
+                np.ones(self.num_joints)*np.pi, 0.01, 20.0]),
+            [2*self.num_joints + self.num_move_degrees], dtype=float)
 
         self.observation_space = gym.spaces.Dict({
             "JOINT_POSITIONS": gym.spaces.Box(
@@ -56,6 +57,7 @@ class Box2DSimRatEnv(gym.Env):
                                           [self.num_touch_sensors],
                                           dtype=float)
                  for obj_name in self.object_names}),
+            "OSCILLATOR": gym.spaces.Box(-np.pi, np.pi, [1], dtype=float),
             "OBJ_POSITION": gym.spaces.Box(
                 -np.inf, np.inf,
                 [len(self.object_names), 2],
@@ -106,14 +108,20 @@ class Box2DSimRatEnv(gym.Env):
 
     def set_action(self, action):
 
-        assert(len(action) == self.num_joints + self.num_move_degrees)
-        action = np.hstack(action)
+        whiskers_angles = self.num_joints - 1
 
-        angles = action*np.sin(self.clock*self.dt_clock)
-        angles[:3] = - angles[:3]
+        assert(len(action) == 2*whiskers_angles + 1 + self.num_move_degrees)
+        action = np.hstack(action)
+        self.oscillator = np.sin(self.clock*self.dt_clock)
+        angles = np.zeros(self.num_joints)
+        angles[:6] = action[:whiskers_angles]*self.oscillator + \
+                action[whiskers_angles:(2*whiskers_angles)]
+        angles[:3] = -angles[:3]
+        angles[-1] = action[-3]
         # do action
         for j, joint in enumerate(self.joint_names):
             self.sim.move(joint, angles[j])
+
 
         self.clock += 1
 
@@ -141,6 +149,7 @@ class Box2DSimRatEnv(gym.Env):
         observation = {
             "JOINT_POSITIONS": joints,
             "TOUCH_SENSORS": sensors,
+            "OSCILLATOR": self.oscillator,
             "OBJ_POSITION": obj_pos}
 
         return observation
@@ -173,7 +182,7 @@ class Box2DSimRatEnv(gym.Env):
         if self.renderer is not None:
             self.renderer.reset()
 
-        return self.sim_step(np.zeros(self.num_joints + self.num_move_degrees))
+        return self.sim_step(np.zeros(2*(self.num_joints-1)+1 + self.num_move_degrees))
 
     def render(self, mode='human'):
 
