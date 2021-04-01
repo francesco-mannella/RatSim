@@ -12,6 +12,12 @@ action = np.array(
      1.0*0.45*np.pi,   # head_to_wr1 amp
      0.5*0.45*np.pi,   # head_to_wr2 amp
      0.5*0.45*np.pi,   # head_to_wr3 amp
+     0,
+     0,
+     0,
+     0,
+     0,
+     0,
      0.0,   # body_to_head angle
      0,     # angular velocity
      0])     # linear velocity

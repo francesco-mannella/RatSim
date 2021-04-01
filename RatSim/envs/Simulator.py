@@ -59,11 +59,12 @@ class Box2DSim(object):
 
             (int): number of contacts
         """
+        
 
         contacts = 0
         for ce in self.bodies[bodyA].contacts:
             if ce.contact.touching is True:
-                if ce.contact.fixtureB.body == self.bodies[bodyB]:
+                if ce.contact.fixtureA.body == self.bodies[bodyB]:
                     contacts += 1
         return contacts
 
@@ -101,7 +102,7 @@ class Box2DSim(object):
         body.transform = (body.position, curr_angle)
 
         pid = self.joint_pids["body_to_head"]
-        pid.setpoint = 10*angle
+        pid.setpoint += 10*angle
 
     def step(self):
         """ A simulation step

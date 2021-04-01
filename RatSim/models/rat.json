@@ -20,11 +20,11 @@
                 "x": 0.0,
                 "y": -7.329896011208284
             },
-            "type": 0,
+            "type": 2,
             "fixture": [
                 {
-                    "density": 400,
-                    "group_index": 0,
+                    "density": 4000,
+                    "group_index": 1,
                     "polygon": {
                         "vertices": {
                             "x": [
@@ -172,7 +172,7 @@
             "fixture": [
                 {
                     "density": 0.01,
-                    "group_index": 0,
+                    "group_index": 1,
                     "polygon": {
                         "vertices": {
                             "x": [
@@ -210,7 +210,7 @@
             "fixture": [
                 {
                     "density": 0.01,
-                    "group_index": 0,
+                    "group_index": 1,
                     "polygon": {
                         "vertices": {
                             "x": [
@@ -248,7 +248,7 @@
             "fixture": [
                 {
                     "density": 0.01,
-                    "group_index": 0,
+                    "group_index": 1,
                     "polygon": {
                         "vertices": {
                             "x": [
@@ -286,7 +286,7 @@
             "fixture": [
                 {
                     "density": 0.01,
-                    "group_index": 0,
+                    "group_index": 1,
                     "polygon": {
                         "vertices": {
                             "x": [
@@ -324,7 +324,7 @@
             "fixture": [
                 {
                     "density": 0.01,
-                    "group_index": 0,
+                    "group_index": 1,
                     "polygon": {
                         "vertices": {
                             "x": [
@@ -362,7 +362,7 @@
             "fixture": [
                 {
                     "density": 0.01,
-                    "group_index": 0,
+                    "group_index": 1,
                     "polygon": {
                         "vertices": {
                             "x": [

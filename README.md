@@ -51,7 +51,7 @@ The two possible values of the argument to be passed to env.render() are:
 
 #### Actions
 
-The action attribute of env.step must be a vector of 9 float elements. Elements in the first 6 indices give the current amplitude of oscillation for each of the 6 whiskers. the 7th index defines the current joint angle of the body-to-head joint. the 8th index defines the angular velocity of the rat. The 9th index defines the speed in the current straight direction.
+The action attribute of env.step must be a vector of 15 float elements. Elements in the first 6 indices give the current amplitude of oscillation for each of the 6 whiskers. Indices from the 7th to the 12th define the central points of oscillations. the 13th index defines the current joint angle of the body-to-head joint. the 14th index defines the angular velocity of the rat. The 15th index defines the speed in the current straight direction.
 
 
 <TABLE width="100%" BORDER="0">

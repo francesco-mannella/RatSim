@@ -36,11 +36,12 @@ aplot, = ax2.plot(t, angles, alpha=0.5,lw=4)
 
 plt.show()
 # %%
-action = np.zeros(9)
 for t in range(stime):
+    
     #env.render("offline")
     env.render()
 
+    action = np.zeros(15)
     # whisker amplitudes
     amplitudes = 0.2*np.pi*np.array([1.7, 1.3, 0.6, 1.7, 1.3, 0.6])
     action[:6] = amplitudes
@@ -51,4 +52,7 @@ for t in range(stime):
     # linear velocity
     action[-1] = speeds[t]
 
-    env.step(action)
+    state, *_ = env.step(action)
+    
+    print(state["TOUCH_SENSORS"])
+
