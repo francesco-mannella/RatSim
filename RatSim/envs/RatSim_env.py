@@ -202,9 +202,10 @@ class Box2DSimRatEnv(gym.Env):
 
         self.world_file = self.world_files[self.world_id]
 
-    def moveObjext(self, obj, pos):
+    def move_object(self, obj, pos):
         origin = self.sim.bodies[obj].position
         self.sim.bodies[obj].position = origin + pos
+        return np.array(origin + pos)
 
     def reset(self, world=None):
         self.choose_worldfile(world)
