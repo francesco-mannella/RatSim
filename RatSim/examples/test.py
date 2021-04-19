@@ -34,4 +34,4 @@ for t in range(30000):
 
     observation = env.step(action)
     if t < 1300:
-        env.moveObjext("box", [0.0, 0.001])
+        env.move_object("box", [0.0, 0.001])
