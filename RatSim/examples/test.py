@@ -22,6 +22,7 @@ action = np.array(
      0,     # angular velocity
      0])     # linear velocity
 
+observation = env.reset(1)
 for t in range(300):
 
     #env.render("offline")
