@@ -26,7 +26,8 @@ for t in range(300):
 
     #env.render("offline")
     env.render()
-    action[-2] += 0.2*(0.04*rng.randn() - action[-2])   # random angular velocity
-    action[-1] += 0.2*(10*rng.randn() - action[-1])  # randomlinear velocity
+    action[-2] += 0.02*(0.04*rng.randn() - action[-2])   # random angular velocity
+    action[-1] += 0.02*(10*rng.randn() - action[-1])  # randomlinear velocity
 
     observation = env.step(action)
+    env.moveObjext("box", [0.0, 0.001])
