@@ -77,16 +77,32 @@ class Box2DSimRatEnv(gym.Env):
         self.renderer_figsize = figsize
 
     def init_worlds(self):
-        self.world_files = [pkg_resources.resource_filename(
-            'RatSim', 'models/rat.json')]
-        self.worlds = {"rat": 0}
-        self.world_object_names = {0: ["box"]}
-        self.object_names = self.world_object_names[self.worlds["rat"]]
+        self.world_files = [
+                pkg_resources.resource_filename('RatSim', 'models/obj1.json'),
+                pkg_resources.resource_filename('RatSim', 'models/obj2.json')]
+        self.worlds = {
+                "obj1": 0, 
+                "obj2":1}
+        self.world_object_names = {
+                0: ["box"],
+                1: ["box"]}
+        self.object_names = self.world_object_names[self.worlds["obj1"]]
+    
+    def choose_worldfile(self, world_id=None):
+
+        self.world_id = world_id
+        if self.world_id is None:
+            self.world_id = self.rng.randint(0, len(self.world_files))
+
+        self.world_file = self.world_files[self.world_id]
 
     def set_world(self, world_id=None):
 
-        self.world_file = self.world_files[0]
-        self.object_names = self.world_object_names[self.worlds["rat"]]
+        if world_id is not None:
+            self.world_id = world_id
+
+        self.choose_worldfile(world_id)
+        self.object_names = self.world_object_names[self.world_id]
 
         world_dict = Sim.loadWorldJson(self.world_file)
         self.sim = Sim(world_dict=world_dict)
@@ -175,7 +191,9 @@ class Box2DSimRatEnv(gym.Env):
 
         self.world_file = self.world_files[self.world_id]
 
-    def reset(self):
+    def reset(self, world=None):
+        self.choose_worldfile(world)
+        self.set_world(self.world_id)
 
         if self.renderer is not None:
             self.renderer.reset()
