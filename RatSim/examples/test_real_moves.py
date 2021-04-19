@@ -12,7 +12,7 @@ def normal(x, m, s):
 
 env = gym.make('RatSim-v0')
 
-stime = 500
+stime = 50000
 
 t = np.linspace(0, 1, stime)
 s = 0.005
@@ -38,8 +38,10 @@ plt.show()
 # %%
 for t in range(stime):
     
+
     #env.render("offline")
-    env.render()
+    if t%100 == 0:
+        env.render()
 
     action = np.zeros(15)
     # whisker amplitudes
@@ -47,12 +49,11 @@ for t in range(stime):
     action[:6] = amplitudes
 
     # rotation velocity
-    action[-2] = angles[t]
+    action[-2] = 0.01*angles[t]
 
     # linear velocity
-    action[-1] = speeds[t]
+    action[-1] = 0.01*speeds[t]
 
     state, *_ = env.step(action)
     
-    print(state["TOUCH_SENSORS"])
 
