@@ -18,40 +18,28 @@
             ],
             "position": {
                 "x": 0.0,
-                "y": -70.329896011208284
+                "y": -6.0
             },
             "type": 2,
             "fixture": [
                 {
-                    "density": 4000,
+                    "density": 40000,
                     "group_index": 1,
                     "polygon": {
                         "vertices": {
                             "x": [
-                                -7.5,
-                                -7.5,
-                                -7.5,
-                                7.5,
-                                7.5,
-                                -7.459378905192609,
-                                7.459565037866375,
-                                7.459565037866375,
-                                -7.459378905192609,
-                                -7.459378905192609,
-                                -7.5
+                                -2.0,
+                                -2.0,
+                                 2.0,
+                                 2.0,
+                                -2.0
                             ],
                             "y": [
-                                -3.129223634352872,
-                                -3.1090993627285357,
-                                3.129223634352873,
-                                3.129223634352873,
-                                -3.129223634352872,
-                                -3.0887888630267035,
-                                -3.0887888630267035,
-                                3.088602539545482,
-                                3.088602539545482,
-                                -3.0887888630267035,
-                                -3.129223634352872
+                                -2.0,
+                                 2.0,
+                                 2.0,
+                                -2.0,
+                                -2.0
                             ]
                         }
                     }
@@ -73,7 +61,7 @@
             "type": 2,
             "fixture": [
                 {
-                    "density": 40,
+                    "density": 400,
                     "group_index": 0,
                     "polygon": {
                         "vertices": {
@@ -123,7 +111,7 @@
             "type": 2,
             "fixture": [
                 {
-                    "density": 1,
+                    "density": 400,
                     "group_index": 0,
                     "polygon": {
                         "vertices": {
@@ -171,7 +159,7 @@
             "type": 2,
             "fixture": [
                 {
-                    "density": 0.01,
+                    "density": 0.001,
                     "group_index": 1,
                     "polygon": {
                         "vertices": {
@@ -209,7 +197,7 @@
             "type": 2,
             "fixture": [
                 {
-                    "density": 0.01,
+                    "density": 0.001,
                     "group_index": 1,
                     "polygon": {
                         "vertices": {
@@ -247,7 +235,7 @@
             "type": 2,
             "fixture": [
                 {
-                    "density": 0.01,
+                    "density": 0.001,
                     "group_index": 1,
                     "polygon": {
                         "vertices": {
@@ -285,7 +273,7 @@
             "type": 2,
             "fixture": [
                 {
-                    "density": 0.01,
+                    "density": 0.001,
                     "group_index": 1,
                     "polygon": {
                         "vertices": {
@@ -323,7 +311,7 @@
             "type": 2,
             "fixture": [
                 {
-                    "density": 0.01,
+                    "density": 0.001,
                     "group_index": 1,
                     "polygon": {
                         "vertices": {
@@ -361,7 +349,7 @@
             "type": 2,
             "fixture": [
                 {
-                    "density": 0.01,
+                    "density": 0.001,
                     "group_index": 1,
                     "polygon": {
                         "vertices": {

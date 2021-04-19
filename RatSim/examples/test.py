@@ -22,11 +22,16 @@ action = np.array(
      0,     # angular velocity
      0])     # linear velocity
 
-for t in range(300):
+observation = env.reset(0)
+for t in range(30000):
 
-    env.render("offline")
 
-    action[-2] += 0.2*(0.04*rng.randn() - action[-2])   # random angular velocity
-    action[-1] += 0.2*(10*rng.randn() - action[-1])  # randomlinear velocity
+    #env.render("offline")
+    if t%50 == 0:
+        env.render()
+    action[-2] += 0.0002*(0.04*rng.randn() - action[-2])   # random angular velocity
+    action[-1] += 0.0002*(0.1*rng.randn() - action[-1])  # randomlinear velocity
 
     observation = env.step(action)
+    if t < 1300:
+        env.moveObjext("box", [0.0, 0.001])

@@ -10,7 +10,7 @@ class MyEgg(EggInfo):
     def run(self):
         EggInfo.run(self)
 
-setup(name='box2dsim',
+setup(name='ratsim',
         version='0.1',
         cmdclass = {
             'install': MyInstall,
