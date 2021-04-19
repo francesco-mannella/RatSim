@@ -137,12 +137,18 @@ class Box2DSimRatEnv(gym.Env):
                                         -self.angles[:whiskers_angles]
         self.angles[:whiskers_angles] += self.d_angles[:-1]*self.dt_clock
 
+        # TODO: central points as velocities
+        self.central_points = action[whiskers_angles:(2*whiskers_angles)]
+
         self.angles[-1] = action[-3]
 
         # do action
         for j, joint in enumerate(self.joint_names):
-            if j < int(whiskers_angles/2):
-                self.sim.move(joint, -self.angles[j])
+            if j < whiskers_angles:
+                if j < int(whiskers_angles/2):
+                    self.sim.move(joint, -self.angles[j] - self.central_points[j] )
+                else:
+                    self.sim.move(joint, self.angles[j] + self.central_points[j])
             else:
                 self.sim.move(joint, self.angles[j])
 
