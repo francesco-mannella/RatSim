@@ -87,13 +87,13 @@ class Box2DSimRatEnv(gym.Env):
                 pkg_resources.resource_filename('RatSim', 'models/obj1.json'),
                 pkg_resources.resource_filename('RatSim', 'models/obj2.json')]
         self.worlds = {
-                "obj1": 0, 
+                "obj1": 0,
                 "obj2":1}
         self.world_object_names = {
                 0: ["box"],
                 1: ["box"]}
         self.object_names = self.world_object_names[self.worlds["obj1"]]
-    
+
     def choose_worldfile(self, world_id=None):
 
         self.world_id = world_id
@@ -177,7 +177,7 @@ class Box2DSimRatEnv(gym.Env):
         joints, joint_velocities, sensors, obj_pos = self.get_observation()
 
         observation = {
-            "JOINT_VELOCITIES": joint_velocities,   
+            "JOINT_VELOCITIES": joint_velocities,
             "JOINT_POSITIONS": joints,
             "TOUCH_SENSORS": sensors,
             "OSCILLATOR": self.oscillator,
@@ -208,9 +208,12 @@ class Box2DSimRatEnv(gym.Env):
 
         self.world_file = self.world_files[self.world_id]
 
-    def move_object(self, obj, pos):
+    def move_object(self, obj, pos, angle=None):
         origin = self.sim.bodies[obj].position
         self.sim.bodies[obj].position = origin + pos
+        if angle is not None:
+            origin_angle = self.sim.bodies[obj].angle
+            self.sim.bodies[obj].angle = origin_angle + angle
         return np.array(origin + pos)
 
     def reset(self, world=None):
