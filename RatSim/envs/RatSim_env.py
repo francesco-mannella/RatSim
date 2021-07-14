@@ -167,6 +167,9 @@ class Box2DSimRatEnv(gym.Env):
         sensors = np.array([np.sum([self.sim.contacts(sensor_name, object_name)
                                     for object_name in self.object_names])
                             for sensor_name in self.sensors_names])
+        sensors += np.array([np.sum([self.sim.contacts(sensor_name, part_name)
+                                    for part_name in self.robot_parts_names])
+                            for sensor_name in self.sensors_names])
         obj_pos = np.array([[self.sim.bodies[object_name].worldCenter]
                             for object_name in self.object_names])
         return joints, self.d_angles, sensors, obj_pos
