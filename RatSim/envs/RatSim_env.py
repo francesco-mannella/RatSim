@@ -144,7 +144,7 @@ class Box2DSimRatEnv(gym.Env):
 
         assert len(action) == 2 * whiskers_angles + 1 + self.num_move_degrees
         action = np.hstack(action)
-        self.oscillator = -np.sin(self.clock * self.dt_clock)
+        self.oscillator = np.sin(self.clock * self.dt_clock)
         self.d_angles[:whiskers_angles] = (
             action[:whiskers_angles] * self.oscillator - self.angles[:whiskers_angles]
         )
@@ -172,8 +172,10 @@ class Box2DSimRatEnv(gym.Env):
         self.sim.step()
 
     def get_observation(self):
+        whiskers_angles = self.num_joints - 1
 
         joints = np.array([self.sim.joints[name].angle for name in self.joint_names])
+        joints[: (whiskers_angles // 2)] *= -1
         sensors = np.array(
             [
                 np.sum(
