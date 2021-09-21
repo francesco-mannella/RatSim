@@ -132,7 +132,7 @@ class Box2DSimRatEnv(gym.Env):
 
         assert(len(action) == 2*whiskers_angles + 1 + self.num_move_degrees)
         action = np.hstack(action)
-        self.oscillator = np.sin(self.clock*self.dt_clock)
+        self.oscillator = -np.sin(self.clock*self.dt_clock)
         self.d_angles[:whiskers_angles] = action[:whiskers_angles]*self.oscillator \
                                         -self.angles[:whiskers_angles]
         self.angles[:whiskers_angles] += self.d_angles[:-1]*self.dt_clock
