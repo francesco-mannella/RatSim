@@ -8,18 +8,24 @@ from scipy import ndimage
 
 
 def DefaultRewardFun(observation):
-    return np.sum(observation['TOUCH_SENSORS'])
+    return np.sum(observation["TOUCH_SENSORS"])
 
 
 class Box2DSimRatEnv(gym.Env):
-    """ A single 2D arm Box2DSimwith a box-shaped object
-    """
-    metadata = {'render.modes': ['human', 'offline']}
-    robot_parts_names = ["body", "head", "wl1", "wl2", "wl3", "wr1",
-                         "wr2", "wr3"]
-    joint_names = ["head_to_wl1", "head_to_wl2", "head_to_wl3", "head_to_wr1",
-                   "head_to_wr2", "head_to_wr3", "body_to_head"]
-    sensors_names = ["wl1", "wl2", "wl3", "wr1","wr2", "wr3"]
+    """A single 2D arm Box2DSimwith a box-shaped object"""
+
+    metadata = {"render.modes": ["human", "offline"]}
+    robot_parts_names = ["body", "head", "wl1", "wl2", "wl3", "wr1", "wr2", "wr3"]
+    joint_names = [
+        "head_to_wl1",
+        "head_to_wl2",
+        "head_to_wl3",
+        "head_to_wr1",
+        "head_to_wr2",
+        "head_to_wr3",
+        "body_to_head",
+    ]
+    sensors_names = ["wl1", "wl2", "wl3", "wr1", "wr2", "wr3"]
 
     def __init__(self):
 
@@ -43,29 +49,40 @@ class Box2DSimRatEnv(gym.Env):
         # They must be gym.spaces objects
         # Example when using discrete actions:
         self.action_space = spaces.Box(
-            np.hstack([np.zeros(self.num_joints),
-                -np.ones(self.num_joints)*np.pi, -0.01, -20.0]),
-            np.hstack([np.ones(self.num_joints)*np.pi,
-                np.ones(self.num_joints)*np.pi, 0.01, 20.0]),
-            [2*self.num_joints + self.num_move_degrees], dtype=float)
+            np.hstack(
+                [
+                    np.zeros(self.num_joints),
+                    -np.ones(self.num_joints) * np.pi,
+                    -0.01,
+                    -20.0,
+                ]
+            ),
+            np.hstack(
+                [
+                    np.ones(self.num_joints) * np.pi,
+                    np.ones(self.num_joints) * np.pi,
+                    0.01,
+                    20.0,
+                ]
+            ),
+            [2 * self.num_joints + self.num_move_degrees],
+            dtype=float,
+        )
 
-        self.observation_space = gym.spaces.Dict({
-            "JOINT_POSITIONS": gym.spaces.Box(
-                -np.inf, np.inf,
-                [self.num_joints],
-                dtype=float),
-            "JOINT_VELOCITIES": gym.spaces.Box(
-                -np.inf, np.inf,
-                [self.num_joints],
-                dtype=float),
-            "TOUCH_SENSORS":gym.spaces.Box(0, np.inf,
-                                          [self.num_touch_sensors],
-                                          dtype=float),
-            "OSCILLATOR": gym.spaces.Box(-np.pi, np.pi, [1], dtype=float),
-            "OBJ_POSITION": gym.spaces.Box(
-                -np.inf, np.inf,
-                [len(self.object_names), 2],
-                dtype=float)})
+        self.observation_space = gym.spaces.Dict(
+            {
+                "JOINT_POSITIONS": gym.spaces.Box(
+                    -np.inf, np.inf, [self.num_joints], dtype=float
+                ),
+                "TOUCH_SENSORS": gym.spaces.Box(
+                    0, np.inf, [self.num_touch_sensors], dtype=float
+                ),
+                "OSCILLATOR": gym.spaces.Box(-np.pi, np.pi, [1], dtype=float),
+                "OBJ_POSITION": gym.spaces.Box(
+                    -np.inf, np.inf, [len(self.object_names), 2], dtype=float
+                ),
+            }
+        )
 
         self.rendererType = TestPlotter
         self.renderer = None
@@ -84,14 +101,11 @@ class Box2DSimRatEnv(gym.Env):
 
     def init_worlds(self):
         self.world_files = [
-                pkg_resources.resource_filename('RatSim', 'models/obj1.json'),
-                pkg_resources.resource_filename('RatSim', 'models/obj2.json')]
-        self.worlds = {
-                "obj1": 0,
-                "obj2":1}
-        self.world_object_names = {
-                0: ["box"],
-                1: ["box"]}
+            pkg_resources.resource_filename("RatSim", "models/obj1.json"),
+            pkg_resources.resource_filename("RatSim", "models/obj2.json"),
+        ]
+        self.worlds = {"obj1": 0, "obj2": 1}
+        self.world_object_names = {0: ["box"], 1: ["box"]}
         self.object_names = self.world_object_names[self.worlds["obj1"]]
 
     def choose_worldfile(self, world_id=None):
@@ -99,14 +113,12 @@ class Box2DSimRatEnv(gym.Env):
         self.world_id = world_id
         if self.world_id is None:
             self.world_id = self.rng.randint(0, len(self.world_files))
-
         self.world_file = self.world_files[self.world_id]
 
     def set_world(self, world_id=None):
 
         if world_id is not None:
             self.world_id = world_id
-
         self.choose_worldfile(world_id)
         self.object_names = self.world_object_names[self.world_id]
 
@@ -130,29 +142,28 @@ class Box2DSimRatEnv(gym.Env):
 
         whiskers_angles = self.num_joints - 1
 
-        assert(len(action) == 2*whiskers_angles + 1 + self.num_move_degrees)
+        assert len(action) == 2 * whiskers_angles + 1 + self.num_move_degrees
         action = np.hstack(action)
-        self.oscillator = -np.sin(self.clock*self.dt_clock)
-        self.d_angles[:whiskers_angles] = action[:whiskers_angles]*self.oscillator \
-                                        -self.angles[:whiskers_angles]
-        self.angles[:whiskers_angles] += self.d_angles[:-1]*self.dt_clock
+        self.oscillator = -np.sin(self.clock * self.dt_clock)
+        self.d_angles[:whiskers_angles] = (
+            action[:whiskers_angles] * self.oscillator - self.angles[:whiskers_angles]
+        )
+        self.angles[:whiskers_angles] += self.d_angles[:-1] * self.dt_clock
 
         # TODO: central points as velocities
-        self.central_points = action[whiskers_angles:(2*whiskers_angles)]
+        self.central_points = action[whiskers_angles : (2 * whiskers_angles)]
 
         self.angles[-1] = action[-3]
 
         # do action
         for j, joint in enumerate(self.joint_names):
             if j < whiskers_angles:
-                if j < int(whiskers_angles/2):
-                    self.sim.move(joint, -self.angles[j] - self.central_points[j] )
+                if j < int(whiskers_angles / 2):
+                    self.sim.move(joint, -self.angles[j] - self.central_points[j])
                 else:
                     self.sim.move(joint, self.angles[j] + self.central_points[j])
             else:
                 self.sim.move(joint, self.angles[j])
-
-
         self.clock += 1
 
         direction = action[-2]
@@ -162,29 +173,48 @@ class Box2DSimRatEnv(gym.Env):
 
     def get_observation(self):
 
-        joints = np.array([self.sim.joints[name].angle
-                           for name in self.joint_names])
-        sensors = np.array([np.sum([self.sim.contacts(sensor_name, object_name)
-                                    for object_name in self.object_names])
-                            for sensor_name in self.sensors_names])
-        sensors += np.array([np.sum([self.sim.contacts(sensor_name, part_name)
-                                    for part_name in self.robot_parts_names])
-                            for sensor_name in self.sensors_names])
-        obj_pos = np.array([[self.sim.bodies[object_name].worldCenter]
-                            for object_name in self.object_names])
-        return joints, self.d_angles, sensors, obj_pos
+        joints = np.array([self.sim.joints[name].angle for name in self.joint_names])
+        sensors = np.array(
+            [
+                np.sum(
+                    [
+                        self.sim.contacts(sensor_name, object_name)
+                        for object_name in self.object_names
+                    ]
+                )
+                for sensor_name in self.sensors_names
+            ]
+        )
+        sensors += np.array(
+            [
+                np.sum(
+                    [
+                        self.sim.contacts(sensor_name, part_name)
+                        for part_name in self.robot_parts_names
+                    ]
+                )
+                for sensor_name in self.sensors_names
+            ]
+        )
+        obj_pos = np.array(
+            [
+                [self.sim.bodies[object_name].worldCenter]
+                for object_name in self.object_names
+            ]
+        )
+        return joints, sensors, obj_pos
 
     def sim_step(self, action):
 
         self.set_action(action)
-        joints, joint_velocities, sensors, obj_pos = self.get_observation()
+        joints, sensors, obj_pos = self.get_observation()
 
         observation = {
-            "JOINT_VELOCITIES": joint_velocities,
             "JOINT_POSITIONS": joints,
             "TOUCH_SENSORS": sensors,
             "OSCILLATOR": self.oscillator,
-            "OBJ_POSITION": obj_pos}
+            "OBJ_POSITION": obj_pos,
+        }
 
         return observation
 
@@ -208,7 +238,6 @@ class Box2DSimRatEnv(gym.Env):
         self.world_id = world_id
         if self.world_id is None:
             self.world_id = self.rng.randint(0, len(self.world_files))
-
         self.world_file = self.world_files[self.world_id]
 
     def move_object(self, obj, pos, angle=None):
@@ -225,26 +254,28 @@ class Box2DSimRatEnv(gym.Env):
 
         if self.renderer is not None:
             self.renderer.reset()
+        return self.sim_step(
+            np.zeros(2 * (self.num_joints - 1) + 1 + self.num_move_degrees)
+        )
 
-        return self.sim_step(np.zeros(2*(self.num_joints-1)+1 + self.num_move_degrees))
+    def render(self, mode="human"):
 
-    def render(self, mode='human'):
-
-        if mode == 'human':
+        if mode == "human":
             if self.renderer is None:
                 self.renderer = self.rendererType(
                     self,
                     xlim=self.taskspace_xlim,
                     ylim=self.taskspace_ylim,
-                    figsize=self.renderer_figsize)
-        elif mode == 'offline':
+                    figsize=self.renderer_figsize,
+                )
+        elif mode == "offline":
             if self.renderer is None:
                 self.renderer = self.rendererType(
                     self,
                     xlim=self.taskspace_xlim,
                     ylim=self.taskspace_ylim,
                     offline=True,
-                    figsize=self.renderer_figsize)
-
+                    figsize=self.renderer_figsize,
+                )
         if self.renderer is not None:
             self.renderer.step()
