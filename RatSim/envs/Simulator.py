@@ -59,7 +59,7 @@ class Box2DSim(object):
 
             (int): number of contacts
         """
-        
+
 
         contacts = 0
         for ce in self.bodies[bodyA].contacts:
