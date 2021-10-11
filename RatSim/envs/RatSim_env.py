@@ -86,7 +86,7 @@ class Box2DSimRatEnv(gym.Env):
 
         self.rendererType = TestPlotter
         self.renderer = None
-        self.renderer_figsize = (3, 3)
+        self.renderer_figsize = (5, 5)
 
         self.taskspace_xlim = [-5, 5]
         self.taskspace_ylim = [-6, 3]
