@@ -87,6 +87,7 @@ class Box2DSimRatEnv(gym.Env):
         self.rendererType = TestPlotter
         self.renderer = None
         self.renderer_figsize = (5, 5)
+        self.renderer_colors = None
 
         self.taskspace_xlim = [-5, 5]
         self.taskspace_ylim = [-6, 3]
@@ -255,7 +256,7 @@ class Box2DSimRatEnv(gym.Env):
         self.set_world(self.world_id)
 
         if self.renderer is not None:
-            self.renderer.reset()
+            self.renderer.reset(self.renderer_colors)
         return self.sim_step(
             np.zeros(2 * (self.num_joints - 1) + 1 + self.num_move_degrees)
         )
@@ -269,6 +270,7 @@ class Box2DSimRatEnv(gym.Env):
                     xlim=self.taskspace_xlim,
                     ylim=self.taskspace_ylim,
                     figsize=self.renderer_figsize,
+                    colors=self.renderer_colors,
                 )
         elif mode == "offline":
             if self.renderer is None:
@@ -278,6 +280,7 @@ class Box2DSimRatEnv(gym.Env):
                     ylim=self.taskspace_ylim,
                     offline=True,
                     figsize=self.renderer_figsize,
+                    colors=self.renderer_colors,
                 )
         if self.renderer is not None:
             self.renderer.step()

@@ -15,15 +15,16 @@ import glob
 
 
 class Box2DSim(object):
-    """ 2D physics using box2d and a json conf file
-    """
+    """2D physics using box2d and a json conf file"""
+
     @staticmethod
     def loadWorldJson(world_file):
         jsw = json2d.load_json_data(world_file)
         return jsw
 
-    def __init__(self, world_file=None, world_dict=None, dt=1/80.0,
-                 vel_iters=30, pos_iters=2):
+    def __init__(
+        self, world_file=None, world_dict=None, dt=1 / 80.0, vel_iters=30, pos_iters=2
+    ):
         """
         Args:
 
@@ -44,11 +45,12 @@ class Box2DSim(object):
         self.world = world
         self.bodies = bodies
         self.joints = joints
-        self.joint_pids = {("%s" % k): PID(dt=self.dt)
-                           for k in list(self.joints.keys())}
+        self.joint_pids = {
+            ("%s" % k): PID(dt=self.dt) for k in list(self.joints.keys())
+        }
 
     def contacts(self, bodyA, bodyB):
-        """ Read contacts between two parts of the simulation
+        """Read contacts between two parts of the simulation
 
         Args:
 
@@ -60,7 +62,6 @@ class Box2DSim(object):
             (int): number of contacts
         """
 
-
         contacts = 0
         for ce in self.bodies[bodyA].contacts:
             if ce.contact.touching is True:
@@ -69,7 +70,7 @@ class Box2DSim(object):
         return contacts
 
     def move(self, joint_name, angle):
-        """ change the angle of a joint
+        """change the angle of a joint
 
         Args:
 
@@ -81,7 +82,7 @@ class Box2DSim(object):
         pid.setpoint = angle
 
     def move_body(self, angle, speed):
-        """ Move the robot
+        """Move the robot
 
         Must have a "body" object
 
@@ -94,22 +95,22 @@ class Box2DSim(object):
         body = self.bodies["body"]
 
         body.angle += angle
-        #body.angle = np.maximum(0.3*np.pi, body.angle)
-        #body.angle = np.minimum(-0.3*np.pi, body.angle)
+        # body.angle = np.maximum(0.3*np.pi, body.angle)
+        # body.angle = np.minimum(-0.3*np.pi, body.angle)
         curr_angle = body.angle
-        body.linearVelocity = -speed*np.array(
-            [np.cos(curr_angle+np.pi/2), np.sin(curr_angle+np.pi/2)])
+        body.linearVelocity = -speed * np.array(
+            [np.cos(curr_angle + np.pi / 2), np.sin(curr_angle + np.pi / 2)]
+        )
         body.transform = (body.position, curr_angle)
 
         pid = self.joint_pids["body_to_head"]
-        pid.setpoint += 10*angle
+        pid.setpoint += 10 * angle
 
     def step(self):
-        """ A simulation step
-        """
+        """A simulation step"""
         for key in list(self.joints.keys()):
             self.joint_pids[key].step(self.joints[key].angle)
-            self.joints[key].motorSpeed = (self.joint_pids[key].output)
+            self.joints[key].motorSpeed = self.joint_pids[key].output
         self.world.Step(self.dt, self.vel_iters, self.pos_iters)
 
 
@@ -118,14 +119,15 @@ class Box2DSim(object):
 
 
 class TestPlotter:
-    """ Plotter of simulations
+    """Plotter of simulations
     Builds a simple matplotlib graphic environment
     and render single steps of the simulation within it
 
     """
 
-    def __init__(self, env, xlim=[-5, 5], ylim=[-6, 3],
-                 figsize=None, offline=False):
+    def __init__(
+        self, env, xlim=[-5, 5], ylim=[-6, 3], figsize=None, offline=False, colors=None
+    ):
         """
         Args:
             env (Box2DSim): a emulator object
@@ -144,20 +146,24 @@ class TestPlotter:
 
         self.ax = None
 
-        self.reset()
+        self.reset(colors)
 
-    def reset(self):
+    def reset(self, colors=None):
 
         if self.ax is not None:
             plt.delaxes(self.ax)
         self.ax = self.fig.add_subplot(111, aspect="equal")
         self.polygons = {}
         for key in self.env.sim.bodies.keys():
+            if colors is not None and key in colors.keys():
+                self.env.sim.bodies[key].color = colors[key]
+
             self.polygons[key] = Polygon(
                 [[0, 0]],
                 ec=self.env.sim.bodies[key].color + [1],
                 fc=self.env.sim.bodies[key].color + [1],
-                closed=True)
+                closed=True,
+            )
 
             self.ax.add_artist(self.polygons[key])
 
@@ -172,14 +178,12 @@ class TestPlotter:
         pass
 
     def step(self):
-        """ Run a single emulator step
-        """
+        """Run a single emulator step"""
 
         for key in self.polygons:
             body = self.env.sim.bodies[key]
             vercs = np.vstack(body.fixtures[0].shape.vertices)
-            data = np.vstack([body.GetWorldPoint(vercs[x])
-                              for x in range(len(vercs))])
+            data = np.vstack([body.GetWorldPoint(vercs[x]) for x in range(len(vercs))])
             self.polygons[key].set_xy(data)
 
         self.onStep()
