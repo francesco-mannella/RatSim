@@ -127,6 +127,9 @@ class Box2DSimRatEnv(gym.Env):
         self.sim = Sim(world_dict=world_dict)
         self.clock = 0
 
+    def set_dt(self, dt):
+        self.dt_clock = dt
+
     def set_seed(self, seed=None):
         self.seed = seed
         if self.seed is None:
