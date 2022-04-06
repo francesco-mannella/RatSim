@@ -125,6 +125,11 @@ class Box2DSimRatEnv(gym.Env):
 
         world_dict = Sim.loadWorldJson(self.world_file)
         self.sim = Sim(world_dict=world_dict)
+
+        body_to_head_pid = self.sim.joint_pids["body_to_head"]
+        body_to_head_pid.Kp = 2.0
+        body_to_head_pid.Kd = 1.0
+
         self.clock = 0
 
     def set_dt(self, dt):
