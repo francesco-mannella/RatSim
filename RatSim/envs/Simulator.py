@@ -165,7 +165,6 @@ class Box2DSim(object):
 # ------------------------------------------------------------------------------
 
 
-from .mkvideo import vidManager
 class TestPlotter:
     """Plotter of simulations
     Builds a simple matplotlib graphic environment
@@ -173,8 +172,9 @@ class TestPlotter:
 
     """
 
-    def __init__(self, env, xlim=[-5, 5], ylim=[-6, 3],
-                 figsize=None, offline=False, figure=None, axis_pos=None):
+    def __init__(
+        self, env, xlim=[-5, 5], ylim=[-6, 3], figsize=None, offline=False, colors=None
+    ):
         """
         Args:
             env (Box2DSim): a emulator object
@@ -186,75 +186,62 @@ class TestPlotter:
         self.xlim = xlim
         self.ylim = ylim
 
-        if figure is None:
         if figsize is None:
             self.fig = plt.figure()
         else:
             self.fig = plt.figure(figsize=figsize)
-        else:
-            self.fig = figure
 
         self.ax = None
 
-        self.axis_pos = axis_pos
-        self.reset()
-        self.ts = 0
+        self.reset(colors)
 
-        dirname = tempfile.mkdtemp()
-        self.vm = vidManager(self.fig, name="sim", dirname=dirname, duration=100)
+    def reset(self, colors=None):
 
-    def reset(self):
-
-        self.fig.clear()
         if self.ax is not None:
             plt.delaxes(self.ax)
-        if self.axis_pos is None:
-            plt.subplot(111, aspect="equal")
-        else:
-            plt.subplot(self.axis_pos, aspect="equal")
+        self.ax = self.fig.add_subplot(111, aspect="equal")
         self.polygons = {}
         for key in self.env.sim.bodies.keys():
+            if colors is not None and key in colors.keys():
+                self.env.sim.bodies[key].color = colors[key]
+
             self.polygons[key] = Polygon(
                 [[0, 0]],
                 ec=self.env.sim.bodies[key].color + [1],
                 fc=self.env.sim.bodies[key].color + [1],
-                closed=True)
+                closed=True,
+            )
 
-            plt.gca().add_artist(self.polygons[key])
+            self.ax.add_artist(self.polygons[key])
 
-        plt.xlim(self.xlim)
-        plt.ylim(self.ylim)
+        self.ax.set_xlim(self.xlim)
+        self.ax.set_ylim(self.ylim)
+        if not self.offline:
+            self.fig.show()
+        else:
+            self.ts = 0
 
     def onStep(self):
         pass
 
     def step(self):
-        """ Run a single emulator step
-        """
-        self.reset()
+        """Run a single emulator step"""
+
         for key in self.polygons:
             body = self.env.sim.bodies[key]
             vercs = np.vstack(body.fixtures[0].shape.vertices)
-            data = np.vstack([body.GetWorldPoint(vercs[x])
-                              for x in range(len(vercs))])
+            data = np.vstack([body.GetWorldPoint(vercs[x]) for x in range(len(vercs))])
             self.polygons[key].set_xy(data)
 
         self.onStep()
 
+        if not self.offline:
+            self.fig.canvas.flush_events()
             self.fig.canvas.draw()
-        if self.offline == True:
-            self.vm.save_frame()
-        self.ts += 1
-    
-    def video(self, jupyter=True):
-        self.vm.mk_video()
-
-        if jupyter is True:
-            img = open(self.vm.vid_path, 'rb')
-            img = Image(open(self.vm.vid_path, 'rb').read())
         else:
-            img = self.vm.frames[-1]
+            if not os.path.exists("frames"):
+                os.makedirs("frames")
 
-
-        return img
-        
+            self.fig.savefig("frames/frame%06d.png" % self.ts, dpi=200)
+            self.fig.canvas.draw()
+            self.ts += 1
