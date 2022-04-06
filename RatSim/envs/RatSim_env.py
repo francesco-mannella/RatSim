@@ -44,6 +44,7 @@ class Box2DSimRatEnv(gym.Env):
         self.dt_clock = 0.005
         self.angles = np.zeros(self.num_joints)
         self.d_angles = np.zeros(self.num_joints)
+        self.noise = None
 
         # Define action and observation space
         # They must be gym.spaces objects
@@ -86,8 +87,9 @@ class Box2DSimRatEnv(gym.Env):
 
         self.rendererType = TestPlotter
         self.renderer = None
-        self.renderer_figsize = (5, 5)
-        self.renderer_colors = None
+        self.renderer_figsize = (3, 3)
+        self.renderer_fig = None
+        self.renderer_axis = None
 
         self.taskspace_xlim = [-5, 5]
         self.taskspace_ylim = [-6, 3]
@@ -97,10 +99,20 @@ class Box2DSimRatEnv(gym.Env):
         self.set_world(0)
         self.reset()
 
+    def set_dt(self, dt):
+        self.dt_clock = dt
+
     def set_renderer_figsize(self, figsize):
         self.renderer_figsize = figsize
 
+    def set_renderer_fig(self, fig):
+        self.renderer_fig = fig
+        
+    def set_renderer_axis(self, axis):
+        self.renderer_axis = axis
+        
     def init_worlds(self):
+        
         self.world_files = [
             pkg_resources.resource_filename("RatSim", "models/obj1.json"),
             pkg_resources.resource_filename("RatSim", "models/obj2.json"),
@@ -116,6 +128,17 @@ class Box2DSimRatEnv(gym.Env):
             self.world_id = self.rng.randint(0, len(self.world_files))
         self.world_file = self.world_files[self.world_id]
 
+    def randomize_objects(self, world_dict, noise= None):
+        if noise is not None:    
+            for bodyName in self.object_names:
+                for i in range(len(world_dict["body"])):
+                    if world_dict["body"][i]["name"] == bodyName:
+                        world_dict["body"][i]["position"]["x"] += self.rng.randn()*noise
+                        world_dict["body"][i]["position"]["y"] += self.rng.randn()*noise
+                        break
+        return world_dict
+            
+    
     def set_world(self, world_id=None):
 
         if world_id is not None:
@@ -124,8 +147,9 @@ class Box2DSimRatEnv(gym.Env):
         self.object_names = self.world_object_names[self.world_id]
 
         world_dict = Sim.loadWorldJson(self.world_file)
-        self.sim = Sim(world_dict=world_dict)
+        world_dict = self.randomize_objects(world_dict, self.noise)
 
+        self.sim = Sim(world_dict=world_dict)
         body_to_head_pid = self.sim.joint_pids["body_to_head"]
         body_to_head_pid.Kp = 2.0
         body_to_head_pid.Kd = 1.0
@@ -196,17 +220,7 @@ class Box2DSimRatEnv(gym.Env):
                 for sensor_name in self.sensors_names
             ]
         )
-        # sensors += np.array(
-        #     [
-        #         np.sum(
-        #             [
-        #                 self.sim.contacts(sensor_name, part_name)
-        #                 for part_name in self.robot_parts_names
-        #             ]
-        #         )
-        #         for sensor_name in self.sensors_names
-        #     ]
-        # )
+
         obj_pos = np.array(
             [
                 [self.sim.bodies[object_name].worldCenter]
@@ -264,31 +278,39 @@ class Box2DSimRatEnv(gym.Env):
         self.set_world(self.world_id)
 
         if self.renderer is not None:
-            self.renderer.reset(self.renderer_colors)
+            self.renderer.reset()
         return self.sim_step(
             np.zeros(2 * (self.num_joints - 1) + 1 + self.num_move_degrees)
         )
 
     def render(self, mode="human"):
 
-        if mode == "human":
+        if self.renderer is not None:
+            if (mode == "human" and self.renderer.offline == True) or \
+                (mode == "offline" and self.renderer.offline == False): 
+                    self.renderer = None
+
             if self.renderer is None:
+            if mode == "human":
                 self.renderer = self.rendererType(
                     self,
                     xlim=self.taskspace_xlim,
                     ylim=self.taskspace_ylim,
+                    offline=False,
                     figsize=self.renderer_figsize,
-                    colors=self.renderer_colors,
+                    figure=self.renderer_fig,
+                    axis_pos=self.renderer_axis,
                 )
         elif mode == "offline":
-            if self.renderer is None:
                 self.renderer = self.rendererType(
                     self,
                     xlim=self.taskspace_xlim,
                     ylim=self.taskspace_ylim,
                     offline=True,
                     figsize=self.renderer_figsize,
-                    colors=self.renderer_colors,
+                    figure=self.renderer_fig,
+                    axis_pos=self.renderer_axis,
                 )
-        if self.renderer is not None:
+
             self.renderer.step()
+

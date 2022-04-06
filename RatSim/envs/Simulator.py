@@ -5,26 +5,67 @@ import numpy as np
 from matplotlib.path import Path
 from . import JsonToPyBox2D as json2d
 from .PID import PID
-import time
-import sys
-import os
-import glob
+import time, sys, os, glob
+from Box2D import b2ContactListener
+import os, shutil
+import tempfile
 
+from IPython.display import Image
+import matplotlib.image as mpimg
+
+plt.ioff()
+
+class ContactListener(b2ContactListener):
+    def __init__(self, bodies):
+        b2ContactListener.__init__(self)
+        self.contact_db = {}
+        self.bodies = bodies
+
+        for h in bodies.keys():
+            for k in bodies.keys():
+                self.contact_db[(h, k)]= 0
+
+    def BeginContact(self, contact):
+        for name, body in self.bodies.items():
+            if body == contact.fixtureA.body:
+                bodyA = name
+            elif body == contact.fixtureB.body:
+                bodyB = name
+            
+        self.contact_db[(bodyA, bodyB)] = len(contact.manifold.points)
+
+    def EndContact(self, contact):
+        for name, body in self.bodies.items():
+            if body == contact.fixtureA.body:
+                bodyA = name
+            elif body == contact.fixtureB.body:
+                bodyB = name
+            
+        self.contact_db[(bodyA, bodyB)] = 0
+
+    def PreSolve(self, contact, oldManifold):
+        pass
+
+    def PostSolve(self, contact, impulse):
+        pass
+
+from IPython.display import Image
+import matplotlib.image as mpimg
+
+plt.ioff()
 # ------------------------------------------------------------------------------
 # ------------------------------------------------------------------------------
 
 
 class Box2DSim(object):
-    """2D physics using box2d and a json conf file"""
-
+    """ 2D physics using box2d and a json conf file
+    """
     @staticmethod
     def loadWorldJson(world_file):
         jsw = json2d.load_json_data(world_file)
         return jsw
 
-    def __init__(
-        self, world_file=None, world_dict=None, dt=1 / 80.0, vel_iters=30, pos_iters=2
-    ):
+    def __init__(self, world_file=None, world_dict=None, dt=1/80.0, vel_iters=30, pos_iters=2):
         """
         Args:
 
@@ -39,15 +80,19 @@ class Box2DSim(object):
             world, bodies, joints = json2d.createWorldFromJson(world_file)
         else:
             world, bodies, joints = json2d.createWorldFromJsonObj(world_dict)
+
+        self.contact_listener = ContactListener(bodies)
+        
         self.dt = dt
         self.vel_iters = vel_iters
         self.pos_iters = pos_iters
         self.world = world
+        self.world.contactListener = self.contact_listener
         self.bodies = bodies
         self.joints = joints
-        self.joint_pids = {
-            ("%s" % k): PID(dt=self.dt) for k in list(self.joints.keys())
-        }
+        self.joint_pids = { ("%s" % k): PID(dt=self.dt)
+                for k in list(self.joints.keys()) }
+
 
     def contacts(self, bodyA, bodyB):
         """Read contacts between two parts of the simulation
@@ -61,13 +106,15 @@ class Box2DSim(object):
 
             (int): number of contacts
         """
+        c1 = 0
+        c2 = 0
+        db =  self.contact_listener.contact_db 
+        if (bodyA, bodyB) in db.keys(): 
+            c1 = self.contact_listener.contact_db[(bodyA, bodyB)]
+        if (bodyB, bodyA) in db.keys(): 
+            c2 = self.contact_listener.contact_db[(bodyB, bodyA)]
 
-        contacts = 0
-        for ce in self.bodies[bodyA].contacts:
-            if ce.contact.touching is True:
-                if ce.contact.fixtureA.body == self.bodies[bodyB]:
-                    contacts += 1
-        return contacts
+        return c1 + c2
 
     def move(self, joint_name, angle):
         """change the angle of a joint
@@ -80,6 +127,15 @@ class Box2DSim(object):
         """
         pid = self.joint_pids[joint_name]
         pid.setpoint = angle
+
+    def step(self):
+        """ A simulation step
+        """
+        for key in list(self.joints.keys()):
+            self.joint_pids[key].step(self.joints[key].angle)
+            self.joints[key].motorSpeed = (self.joint_pids[key].output)
+        self.world.Step(self.dt, self.vel_iters, self.pos_iters)
+
 
     def move_body(self, angle, speed):
         """Move the robot
@@ -105,19 +161,11 @@ class Box2DSim(object):
 
         pid = self.joint_pids["body_to_head"]
         pid.setpoint += 10 * angle
-
-    def step(self):
-        """A simulation step"""
-        for key in list(self.joints.keys()):
-            self.joint_pids[key].step(self.joints[key].angle)
-            self.joints[key].motorSpeed = self.joint_pids[key].output
-        self.world.Step(self.dt, self.vel_iters, self.pos_iters)
-
-
 # ------------------------------------------------------------------------------
 # ------------------------------------------------------------------------------
 
 
+from .mkvideo import vidManager
 class TestPlotter:
     """Plotter of simulations
     Builds a simple matplotlib graphic environment
@@ -125,9 +173,8 @@ class TestPlotter:
 
     """
 
-    def __init__(
-        self, env, xlim=[-5, 5], ylim=[-6, 3], figsize=None, offline=False, colors=None
-    ):
+    def __init__(self, env, xlim=[-5, 5], ylim=[-6, 3],
+                 figsize=None, offline=False, figure=None, axis_pos=None):
         """
         Args:
             env (Box2DSim): a emulator object
@@ -139,62 +186,75 @@ class TestPlotter:
         self.xlim = xlim
         self.ylim = ylim
 
+        if figure is None:
         if figsize is None:
             self.fig = plt.figure()
         else:
             self.fig = plt.figure(figsize=figsize)
+        else:
+            self.fig = figure
 
         self.ax = None
 
-        self.reset(colors)
+        self.axis_pos = axis_pos
+        self.reset()
+        self.ts = 0
 
-    def reset(self, colors=None):
+        dirname = tempfile.mkdtemp()
+        self.vm = vidManager(self.fig, name="sim", dirname=dirname, duration=100)
 
+    def reset(self):
+
+        self.fig.clear()
         if self.ax is not None:
             plt.delaxes(self.ax)
-        self.ax = self.fig.add_subplot(111, aspect="equal")
+        if self.axis_pos is None:
+            plt.subplot(111, aspect="equal")
+        else:
+            plt.subplot(self.axis_pos, aspect="equal")
         self.polygons = {}
         for key in self.env.sim.bodies.keys():
-            if colors is not None and key in colors.keys():
-                self.env.sim.bodies[key].color = colors[key]
-
             self.polygons[key] = Polygon(
                 [[0, 0]],
                 ec=self.env.sim.bodies[key].color + [1],
                 fc=self.env.sim.bodies[key].color + [1],
-                closed=True,
-            )
+                closed=True)
 
-            self.ax.add_artist(self.polygons[key])
+            plt.gca().add_artist(self.polygons[key])
 
-        self.ax.set_xlim(self.xlim)
-        self.ax.set_ylim(self.ylim)
-        if not self.offline:
-            self.fig.show()
-        else:
-            self.ts = 0
+        plt.xlim(self.xlim)
+        plt.ylim(self.ylim)
 
     def onStep(self):
         pass
 
     def step(self):
-        """Run a single emulator step"""
-
+        """ Run a single emulator step
+        """
+        self.reset()
         for key in self.polygons:
             body = self.env.sim.bodies[key]
             vercs = np.vstack(body.fixtures[0].shape.vertices)
-            data = np.vstack([body.GetWorldPoint(vercs[x]) for x in range(len(vercs))])
+            data = np.vstack([body.GetWorldPoint(vercs[x])
+                              for x in range(len(vercs))])
             self.polygons[key].set_xy(data)
 
         self.onStep()
 
-        if not self.offline:
-            self.fig.canvas.flush_events()
             self.fig.canvas.draw()
-        else:
-            if not os.path.exists("frames"):
-                os.makedirs("frames")
+        if self.offline == True:
+            self.vm.save_frame()
+        self.ts += 1
+    
+    def video(self, jupyter=True):
+        self.vm.mk_video()
 
-            self.fig.savefig("frames/frame%06d.png" % self.ts, dpi=200)
-            self.fig.canvas.draw()
-            self.ts += 1
+        if jupyter is True:
+            img = open(self.vm.vid_path, 'rb')
+            img = Image(open(self.vm.vid_path, 'rb').read())
+        else:
+            img = self.vm.frames[-1]
+
+
+        return img
+        
