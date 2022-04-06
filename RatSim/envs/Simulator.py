@@ -187,10 +187,10 @@ class TestPlotter:
         self.ylim = ylim
 
         if figure is None:
-        if figsize is None:
-            self.fig = plt.figure()
-        else:
-            self.fig = plt.figure(figsize=figsize)
+            if figsize is None:
+                self.fig = plt.figure()
+            else:
+                self.fig = plt.figure(figsize=figsize)
         else:
             self.fig = figure
 
@@ -241,7 +241,7 @@ class TestPlotter:
 
         self.onStep()
 
-            self.fig.canvas.draw()
+        self.fig.canvas.draw()
         if self.offline == True:
             self.vm.save_frame()
         self.ts += 1
