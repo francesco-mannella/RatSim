@@ -291,26 +291,26 @@ class Box2DSimRatEnv(gym.Env):
                     self.renderer = None
 
             if self.renderer is None:
-            if mode == "human":
-                self.renderer = self.rendererType(
-                    self,
-                    xlim=self.taskspace_xlim,
-                    ylim=self.taskspace_ylim,
-                    offline=False,
-                    figsize=self.renderer_figsize,
-                    figure=self.renderer_fig,
-                    axis_pos=self.renderer_axis,
-                )
-        elif mode == "offline":
-                self.renderer = self.rendererType(
-                    self,
-                    xlim=self.taskspace_xlim,
-                    ylim=self.taskspace_ylim,
-                    offline=True,
-                    figsize=self.renderer_figsize,
-                    figure=self.renderer_fig,
-                    axis_pos=self.renderer_axis,
-                )
+                if mode == "human":
+                    self.renderer = self.rendererType(
+                        self,
+                        xlim=self.taskspace_xlim,
+                        ylim=self.taskspace_ylim,
+                        offline=False,
+                        figsize=self.renderer_figsize,
+                        figure=self.renderer_fig,
+                        axis_pos=self.renderer_axis,
+                    )
+                elif mode == "offline":
+                        self.renderer = self.rendererType(
+                            self,
+                            xlim=self.taskspace_xlim,
+                            ylim=self.taskspace_ylim,
+                            offline=True,
+                            figsize=self.renderer_figsize,
+                            figure=self.renderer_fig,
+                            axis_pos=self.renderer_axis,
+                        )
 
             self.renderer.step()
 
