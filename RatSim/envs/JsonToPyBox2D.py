@@ -2,7 +2,6 @@ import Box2D as b2
 import json
 
 
-
 def updateWorldFromJson(b2_world, filePathName):
     """
     loads json from file to memory
@@ -28,11 +27,12 @@ def updateWorldFromJson(b2_world, filePathName):
 
     return body_refs, joint_refs
 
+
 def createWorldFromJsonObj(json_obj):
     """
- 
+
     and returns b2_world from json obj
-    
+
     :param json_obj: the json object with parameters
     :type filePathName: dict
 
@@ -40,7 +40,7 @@ def createWorldFromJsonObj(json_obj):
     :rtype: tuple(dict(string: b2Body), dict(string: b2Joint))
 
     """
-    
+
     jsw = json_obj
 
     # create world from json data
@@ -52,26 +52,28 @@ def createWorldFromJsonObj(json_obj):
 
     return b2_world, body_refs, joint_refs
 
+
 def load_json_data(filePathName):
-    ''' loads json from file to memory
+    """loads json from file to memory
 
     :param filePathName: the name of the json file with parameters
     :type filePathName: string
 
     :return: world json dictionary
     :rtype: dict
-    '''
+    """
     # load json into memory
     with open(filePathName, "r") as json_file:
         jsw = json.load(json_file)
 
     return jsw
 
+
 def createWorldFromJson(filePathName):
     """
     loads json from file to memory
     and returns b2_world from it
-    
+
     :param filePathName: the name of the json file with parameters
     :type filePathName: string
 
@@ -84,15 +86,16 @@ def createWorldFromJson(filePathName):
 
     return createWorldFromJsonObj(jsw)
 
+
 def add_joints(b2_world, jsw):
-    """ add joints described in the json file
+    """add joints described in the json file
 
     :param b2_world: an handler to a b2World object
     :type b2_world: b2World reference
 
 
     :param jsw: dictionary defining all the gropups of data
-                in the json file 
+                in the json file
     :type jsw: dict(sting: variant)
 
     :return: a dictionary of joints
@@ -111,13 +114,13 @@ def add_joints(b2_world, jsw):
 
 
 def add_bodies(b2_world, jsw):
-    """ add bodies described in the json file
+    """add bodies described in the json file
 
     :param b2_world: an handler to a b2World object
     :type b2_world: b2World reference
 
     :param jsw: dictionary defining all the gropups of data
-                in the json file 
+                in the json file
     :type jsw: dict(sting: variant)
 
     :return: a dictionary of bodies
@@ -139,12 +142,12 @@ def add_bodies(b2_world, jsw):
 
 
 def create_world(jsw):
-    """ creates a b2World object using parameters in the json file
+    """creates a b2World object using parameters in the json file
 
     :param jsw: dictionary defining all the gropups of data
-                in the json file 
+                in the json file
     :type jsw: dict(sting: variant)
-    
+
     :return: the world handler
     :rtype: b2World
 
@@ -156,21 +159,20 @@ def create_world(jsw):
         gravity=rubeVecToB2Vec2(jsw["gravity"]),
         subStepping=jsw["subStepping"],
         warmStarting=jsw["warmStarting"],
-        )
+    )
 
 
-
-def add_joint(b2_world, jsw,  jsw_joint):
-    """ add a joint described in the json file
+def add_joint(b2_world, jsw, jsw_joint):
+    """add a joint described in the json file
 
     :param b2_world: an handler to a b2World object
     :type b2_world: b2World reference
 
     :param jsw: dictionary defining all the gropups of data
-                in the json file 
+                in the json file
     :type jsw: dict(string: variant)
 
-    :param jsw_joint: dictionary defining the parameters of the joint 
+    :param jsw_joint: dictionary defining the parameters of the joint
     :type jsw_joint: dict(string: variant)
 
     :return: the joint name and the joint reference
@@ -183,13 +185,13 @@ def add_joint(b2_world, jsw,  jsw_joint):
     # create joint from definition
     joint_ref = b2_world.CreateJoint(jointDef, jsw_joint["type"])
 
-    return jsw_joint['name'], joint_ref
+    return jsw_joint["name"], joint_ref
 
 
 def create_jointDef(jsw_joint, b2_world):
-    """ create a b2JointDef from the json parameters of the joint
+    """create a b2JointDef from the json parameters of the joint
 
-    :param jsw_joint: dictionary defining the parameters of the joint 
+    :param jsw_joint: dictionary defining the parameters of the joint
     :type jsw_joint: dict(sting: variant)
 
     :param b2_world: an handler to a b2World object
@@ -201,7 +203,7 @@ def create_jointDef(jsw_joint, b2_world):
     """
     joint_type = jsw_joint["type"]  # naming
 
-    #---------------------------------------------------
+    # ---------------------------------------------------
     if joint_type == "revolute":  # Done
         jointDef = b2.b2RevoluteJointDef()
 
@@ -219,7 +221,7 @@ def create_jointDef(jsw_joint, b2_world):
         setAttr(jsw_joint, "refAngle", jointDef, "referenceAngle")
         setAttr(jsw_joint, "upperLimit", jointDef, "upperAngle")
 
-    #---------------------------------------------------
+    # ---------------------------------------------------
     elif joint_type == "distance":  # Done
         jointDef = b2.b2DistanceJointDef()
 
@@ -232,7 +234,7 @@ def create_jointDef(jsw_joint, b2_world):
         setAttr(jsw_joint, "frequency", jointDef, "frequencyHz")
         setAttr(jsw_joint, "length", jointDef)
 
-    #---------------------------------------------------
+    # ---------------------------------------------------
     elif joint_type == "prismatic":  # Done
         jointDef = b2.b2PrismaticJointDef()
 
@@ -250,7 +252,7 @@ def create_jointDef(jsw_joint, b2_world):
         setAttr(jsw_joint, "refAngle", jointDef, "referenceAngle")
         setAttr(jsw_joint, "upperLimit", jointDef, "upperTranslation")
 
-    #---------------------------------------------------
+    # ---------------------------------------------------
     elif joint_type == "wheel":  # Done
         jointDef = b2.b2WheelJointDef()
 
@@ -266,7 +268,7 @@ def create_jointDef(jsw_joint, b2_world):
         setAttr(jsw_joint, "springDampingRatio", jointDef, "dampingRatio")
         setAttr(jsw_joint, "springFrequency", jointDef, "frequencyHz")
 
-    #---------------------------------------------------
+    # ---------------------------------------------------
     elif joint_type == "rope":  # Done
         jointDef = b2.b2RopeJointDef()
 
@@ -277,7 +279,7 @@ def create_jointDef(jsw_joint, b2_world):
         setAttr(jsw_joint, "collideConnected", jointDef)
         setAttr(jsw_joint, "maxLength", jointDef)
 
-    #---------------------------------------------------
+    # ---------------------------------------------------
     elif joint_type == "motor":  # Done
         jointDef = b2.b2MotorJointDef()
 
@@ -291,7 +293,7 @@ def create_jointDef(jsw_joint, b2_world):
         setB2Vec2Attr(jsw_joint, "anchorA", jointDef, "linearOffset")
         setAttr(jsw_joint, "correctionFactor", jointDef)
 
-    #---------------------------------------------------
+    # ---------------------------------------------------
     elif joint_type == "weld":  # Done
         jointDef = b2.b2WeldJointDef()
 
@@ -304,7 +306,7 @@ def create_jointDef(jsw_joint, b2_world):
         setAttr(jsw_joint, "dampingRatio", jointDef)
         setAttr(jsw_joint, "frequency", jointDef, "frequencyHz")
 
-    #---------------------------------------------------
+    # ---------------------------------------------------
     elif joint_type == "friction":  # Done
         jointDef = b2.b2FrictionJointDef()
 
@@ -317,18 +319,18 @@ def create_jointDef(jsw_joint, b2_world):
         setAttr(jsw_joint, "maxTorque", jointDef)
 
     else:
-        print ("unsupported joint type")
+        print("unsupported joint type")
 
     return jointDef
 
 
 def get_body(b2_world, index):
-    """ get the body in a given position
+    """get the body in a given position
 
     :param b2_world: an handler to a b2World object
     :type b2_world: b2World reference
 
-    :param index: the index in the json list of joints 
+    :param index: the index in the json list of joints
     :type index: integer
 
     :return: the body in the given position
@@ -339,16 +341,16 @@ def get_body(b2_world, index):
 
 
 def add_body(b2_world, jsw, jsw_body):
-    """ add a body described in the json file
+    """add a body described in the json file
 
     :param b2_world: an handler to a b2World object
     :type b2_world: b2World reference
 
     :param jsw: dictionary defining all the gropups of data
-                in the json file 
+                in the json file
     :type jsw: dict(sting: variant)
 
-    :param jsw_body: dictionary defining the parameters of the body 
+    :param jsw_body: dictionary defining the parameters of the body
     :type jsw_body: dict(sting: variant)
 
     :return: the joint name and the joint reference
@@ -371,7 +373,7 @@ def add_body(b2_world, jsw, jsw_body):
     setB2Vec2Attr(jsw_body, "linearVelocity", bodyDef)
     setB2Vec2Attr(jsw_body, "position", bodyDef)
     setAttr(jsw_body, "gravityScale", bodyDef)  # pybox2d non documented
-    #setAttr(jsw_body, "massData-I", bodyDef, "inertiaScale")
+    # setAttr(jsw_body, "massData-I", bodyDef, "inertiaScale")
     setAttr(jsw_body, "type", bodyDef)
     setAttr(jsw_body, "awake", bodyDef)
 
@@ -381,23 +383,24 @@ def add_body(b2_world, jsw, jsw_body):
     for fixture in jsw_body["fixture"]:
         add_fixture(body_ref, jsw, fixture)
 
-    return jsw_body['name'], body_ref
+    return jsw_body["name"], body_ref
 
-def add_fixture( b2_world_body, jsw, jsw_fixture ):
-    """ add a fixture to a body
+
+def add_fixture(b2_world_body, jsw, jsw_fixture):
+    """add a fixture to a body
 
     :param b2_world_body: a body
     :type b2_world_body: b2Body
 
     :param jsw: dictionary defining all the gropups of data
-                in the json file 
+                in the json file
     :type jsw: dict(sting: variant)
-    
+
     :param jsw_fixture: a fixture
     :type jsw_fixture: b2Fixture
 
     """
-     
+
     # create and fill fixture definition
     fixtureDef = b2.b2FixtureDef()
 
@@ -405,22 +408,21 @@ def add_fixture( b2_world_body, jsw, jsw_fixture ):
     ### missing pybox2d "filter" b2BodyDef property
 
     # special case for rube documentation of
-    #"filter-categoryBits": 1, //if not present, interpret as 1
+    # "filter-categoryBits": 1, //if not present, interpret as 1
     if "filter-categoryBits" in list(jsw_fixture.keys()):
-        setAttr(jsw_fixture, "filter-categoryBits", 
-                fixtureDef, "categoryBits")
+        setAttr(jsw_fixture, "filter-categoryBits", fixtureDef, "categoryBits")
     else:
         fixtureDef.categoryBits = 1
 
     # special case for Rube Json property
-    #"filter-maskBits": 1, //if not present, interpret as 65535
+    # "filter-maskBits": 1, //if not present, interpret as 65535
     if "filter-maskBits" in list(jsw_fixture.keys()):
         setAttr(jsw_fixture, "filter-maskBits", fixtureDef, "maskBits")
     else:
         fixtureDef.maskBits = 65535
 
     setAttr(jsw_fixture, "density", fixtureDef)
-    setAttr(jsw_fixture, "filter-groupIndex", fixtureDef, "groupIndex")
+    setAttr(jsw_fixture, "group_index", fixtureDef, "groupIndex")
     setAttr(jsw_fixture, "friction", fixtureDef)
     setAttr(jsw_fixture, "sensor", fixtureDef, "isSensor")
     setAttr(jsw_fixture, "restitution", fixtureDef)
@@ -432,24 +434,18 @@ def add_fixture( b2_world_body, jsw, jsw_fixture ):
         if jsw_fixture["circle"]["center"] == 0:
             center_b2Vec2 = b2.b2Vec2(0, 0)
         else:
-            center_b2Vec2 = rubeVecToB2Vec2(
-                jsw_fixture["circle"]["center"]
-                )
+            center_b2Vec2 = rubeVecToB2Vec2(jsw_fixture["circle"]["center"])
         fixtureDef.shape = b2.b2CircleShape(
             pos=center_b2Vec2,
             radius=jsw_fixture["circle"]["radius"],
-            )
+        )
 
     if "polygon" in list(jsw_fixture.keys()):  # works ok
-        polygon_vertices = rubeVecArrToB2Vec2Arr(
-            jsw_fixture["polygon"]["vertices"]
-            )
+        polygon_vertices = rubeVecArrToB2Vec2Arr(jsw_fixture["polygon"]["vertices"])
         fixtureDef.shape = b2.b2PolygonShape(vertices=polygon_vertices)
 
     if "chain" in list(jsw_fixture.keys()):  # works ok
-        chain_vertices = rubeVecArrToB2Vec2Arr(
-            jsw_fixture["chain"]["vertices"]
-            )
+        chain_vertices = rubeVecArrToB2Vec2Arr(jsw_fixture["chain"]["vertices"])
 
         if len(chain_vertices) >= 3:
             # closed-loop b2LoopShape
@@ -463,70 +459,67 @@ def add_fixture( b2_world_body, jsw, jsw_fixture ):
                 fixtureDef.shape = b2.b2LoopShape(
                     vertices_loop=chain_vertices,
                     count=len(chain_vertices),
-                    )
+                )
 
                 setAttr(
                     jsw_fixture["chain"],
                     "hasNextVertex",
                     fixtureDef.shape,
                     "m_hasNextVertex",
-                    )
+                )
                 setB2Vec2Attr(
                     jsw_fixture["chain"],
                     "nextVertex",
                     fixtureDef,
                     "m_nextVertex",
-                    )
+                )
 
                 setAttr(
                     jsw_fixture["chain"],
                     "hasPrevVertex",
                     fixtureDef.shape,
                     "m_hasPrevVertex",
-                    )
+                )
                 setB2Vec2Attr(
-                    jsw_fixture["chain"],
-                    "prevVertex",
-                    fixtureDef.shape,
-                    "m_prevVertex"
-                    )
+                    jsw_fixture["chain"], "prevVertex", fixtureDef.shape, "m_prevVertex"
+                )
 
             else:  # open-ended ChainShape
                 # Done
                 fixtureDef.shape = b2.b2ChainShape(
                     vertices_chain=chain_vertices,
                     count=len(chain_vertices),
-                    )
+                )
 
         # json chain is b2EdgeShape
         # Done
         if len(chain_vertices) < 3:
             fixtureDef.shape = b2.b2EdgeShape(
                 vertices=chain_vertices,
-                )
+            )
 
     # create fixture
     b2_world_body.CreateFixture(fixtureDef)
 
-def setAttr(
-        source_dict, source_key, target_obj, target_attr=None):
-    """ assigns values from dict to target object, if key exists in dict
-        may take renamed attribute for object works only with built_in values
-        
-        :param source_dict: a dictionary from the json file
-        :type source_dict: dict(string, variant)
 
-        :param source_key: the key of a object within source_dict
-        :type source_key: string
-        
-        :param target_obj: an object with a 'source_key' or 'target_attr'
-                           attribute
-        :type target_obj: variant
-       
-        :param target_attr: the attribute of the target_obj where to put 
-                            the object related to source_key. 
-                            Defaults to source_key
-        :type target_attr: string
+def setAttr(source_dict, source_key, target_obj, target_attr=None):
+    """assigns values from dict to target object, if key exists in dict
+    may take renamed attribute for object works only with built_in values
+
+    :param source_dict: a dictionary from the json file
+    :type source_dict: dict(string, variant)
+
+    :param source_key: the key of a object within source_dict
+    :type source_key: string
+
+    :param target_obj: an object with a 'source_key' or 'target_attr'
+                       attribute
+    :type target_obj: variant
+
+    :param target_attr: the attribute of the target_obj where to put
+                        the object related to source_key.
+                        Defaults to source_key
+    :type target_attr: string
 
 
     """
@@ -537,16 +530,16 @@ def setAttr(
             setattr(target_obj, target_attr, source_dict[source_key])
         else:
             print(("No attr: " + target_attr + " in object"))
-    
+
 
 def rubeVecToB2Vec2(rube_vec):
-    """ converter from rube json vector to b2Vec2 array
-        
-        :param rube_vec: a 2D vector in rube syntax
-        :type rube_vec: a dict with x an y keys and a single item
-        
-        :return: a 2D point
-        :rtype: b2Vec2
+    """converter from rube json vector to b2Vec2 array
+
+    :param rube_vec: a 2D vector in rube syntax
+    :type rube_vec: a dict with x an y keys and a single item
+
+    :return: a 2D point
+    :rtype: b2Vec2
 
     """
     # converter from rube json vector to b2Vec2
@@ -554,8 +547,8 @@ def rubeVecToB2Vec2(rube_vec):
 
 
 def rubeVecArrToB2Vec2Arr(vector_array):
-    """ converter from rube json vector array to b2Vec2 array
-    
+    """converter from rube json vector array to b2Vec2 array
+
     :param vector_array: a dict with keys x and y
     :type vector_array: dict(string: float)
 
@@ -564,30 +557,27 @@ def rubeVecArrToB2Vec2Arr(vector_array):
 
 
     """
-    return [b2.b2Vec2(x, y) for x, y in zip(
-            vector_array["x"],
-            vector_array["y"]
-            )]
+    return [b2.b2Vec2(x, y) for x, y in zip(vector_array["x"], vector_array["y"])]
 
 
 def setB2Vec2Attr(source_dict, source_key, target_obj, target_attr=None):
-    """ assigns array values from dict to target object, if key exists in dict
-        may take renamed attribute for object works only with built_in values
-        
-        :param source_dict: a dictionary from the json file
-        :type source_dict: dict(string, variant)
+    """assigns array values from dict to target object, if key exists in dict
+    may take renamed attribute for object works only with built_in values
 
-        :param source_key: the key of a object within source_dict
-        :type source_key: string
-        
-        :param target_obj: an object with a 'source_key' or 'target_attr'
-                           attribute
-        :type target_obj: variant
-       
-        :param target_attr: the attribute of the target_obj where to put 
-                            the object related to source_key. 
-                            Defaults to source_key
-        :type target_attr: string
+    :param source_dict: a dictionary from the json file
+    :type source_dict: dict(string, variant)
+
+    :param source_key: the key of a object within source_dict
+    :type source_key: string
+
+    :param target_obj: an object with a 'source_key' or 'target_attr'
+                       attribute
+    :type target_obj: variant
+
+    :param target_attr: the attribute of the target_obj where to put
+                        the object related to source_key.
+                        Defaults to source_key
+    :type target_attr: string
     """
 
     if source_key in list(source_dict.keys()):

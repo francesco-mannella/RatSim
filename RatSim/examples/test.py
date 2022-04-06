@@ -6,8 +6,8 @@ rng = np.random.RandomState(2)
 
 env = gym.make('RatSim-v0')
 action = np.array(
-    [1.0*0.45*np.pi,   # head_to_wl1 amp
-     0.5*0.45*np.pi,   # head_to_wl2 amp
+    [0.5*0.45*np.pi,   # head_to_wl1 amp
+     1.5*0.45*np.pi,   # head_to_wl2 amp
      0.5*0.45*np.pi,   # head_to_wl3 amp
      1.0*0.45*np.pi,   # head_to_wr1 amp
      0.5*0.45*np.pi,   # head_to_wr2 amp
@@ -32,6 +32,7 @@ for t in range(30000):
     action[-2] += 0.0002*(0.04*rng.randn() - action[-2])   # random angular velocity
     action[-1] += 0.0002*(0.1*rng.randn() - action[-1])  # randomlinear velocity
 
-    observation = env.step(action)
+    observation,*_ = env.step(action)
+    print(observation["TOUCH_SENSORS"])
     if t < 1300:
         env.move_object("box", [0.0, 0.001])
