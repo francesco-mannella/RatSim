@@ -25,7 +25,6 @@ action = np.array(
 observation = env.reset(0)
 for t in range(30000):
 
-
     #env.render("offline")
     if t%50 == 0:
         env.render()
