@@ -10,11 +10,6 @@ from Box2D import b2ContactListener
 import os, shutil
 import tempfile
 
-from IPython.display import Image
-import matplotlib.image as mpimg
-
-plt.ioff()
-
 class ContactListener(b2ContactListener):
     def __init__(self, bodies):
         b2ContactListener.__init__(self)
