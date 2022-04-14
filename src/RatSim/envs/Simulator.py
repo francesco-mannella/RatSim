@@ -13,7 +13,6 @@ import tempfile
 from IPython.display import Image
 import matplotlib.image as mpimg
 
-plt.ioff()
 
 class ContactListener(b2ContactListener):
     def __init__(self, bodies):
@@ -32,7 +31,7 @@ class ContactListener(b2ContactListener):
             elif body == contact.fixtureB.body:
                 bodyB = name
             
-        self.contact_db[(bodyA, bodyB)] = len(contact.manifold.points)
+        self.contact_db[(bodyA, bodyB)] += len(contact.manifold.points)
 
     def EndContact(self, contact):
         for name, body in self.bodies.items():
@@ -49,10 +48,6 @@ class ContactListener(b2ContactListener):
     def PostSolve(self, contact, impulse):
         pass
 
-from IPython.display import Image
-import matplotlib.image as mpimg
-
-plt.ioff()
 # ------------------------------------------------------------------------------
 # ------------------------------------------------------------------------------
 
@@ -65,7 +60,7 @@ class Box2DSim(object):
         jsw = json2d.load_json_data(world_file)
         return jsw
 
-    def __init__(self, world_file=None, world_dict=None, dt=1/80.0, vel_iters=30, pos_iters=2):
+    def __init__(self, world_file=None, world_dict=None, dt=1/80.0, vel_iters=30, pos_iters=10):
         """
         Args:
 
@@ -173,6 +168,8 @@ class TestPlotter:
 
     """
 
+    figure = None
+
     def __init__(self, env, xlim=[-5, 5], ylim=[-6, 3],
                  figsize=None, offline=False, figure=None, axis_pos=None):
         """
@@ -186,13 +183,18 @@ class TestPlotter:
         self.xlim = xlim
         self.ylim = ylim
 
-        if figure is None:
-            if figsize is None:
-                self.fig = plt.figure()
+        if TestPlotter.figure is None:
+            if figure is None:
+                if figsize is None:
+                    self.fig = plt.figure()
+                else:
+                    self.fig = plt.figure(figsize=figsize)
             else:
-                self.fig = plt.figure(figsize=figsize)
+                self.fig = figure
+            TestPlotter.figure = self.fig
         else:
-            self.fig = figure
+            self.fig = TestPlotter.figure
+
 
         self.ax = None
 
@@ -231,7 +233,7 @@ class TestPlotter:
     def step(self):
         """ Run a single emulator step
         """
-        self.reset()
+        ##self.reset()
         for key in self.polygons:
             body = self.env.sim.bodies[key]
             vercs = np.vstack(body.fixtures[0].shape.vertices)
@@ -244,6 +246,8 @@ class TestPlotter:
         self.fig.canvas.draw()
         if self.offline == True:
             self.vm.save_frame()
+        else:
+            plt.pause(0.01)
         self.ts += 1
     
     def video(self, jupyter=True):
@@ -253,7 +257,7 @@ class TestPlotter:
             img = open(self.vm.vid_path, 'rb')
             img = Image(open(self.vm.vid_path, 'rb').read())
         else:
-            img = self.vm.frames[-1]
+            img = self.vm.frames
 
 
         return img
