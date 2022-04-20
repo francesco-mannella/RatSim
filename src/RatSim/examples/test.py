@@ -22,7 +22,7 @@ action = np.array(
      0,     # angular velocity
      0])     # linear velocity
 
-observation = env.reset(0)
+observation = env.reset()
 for t in range(30000):
 
 
