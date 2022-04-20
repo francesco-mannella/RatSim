@@ -5,26 +5,62 @@ import numpy as np
 from matplotlib.path import Path
 from . import JsonToPyBox2D as json2d
 from .PID import PID
-import time
-import sys
-import os
-import glob
+import time, sys, os, glob
+from Box2D import b2ContactListener
+import os, shutil
+import tempfile
 
+class ContactListener(b2ContactListener):
+    def __init__(self, bodies):
+        b2ContactListener.__init__(self)
+        self.contact_db = {}
+        self.bodies = bodies
+
+        for h in bodies.keys():
+            for k in bodies.keys():
+                self.contact_db[(h, k)]= 0
+
+    def BeginContact(self, contact):
+        for name, body in self.bodies.items():
+            if body == contact.fixtureA.body:
+                bodyA = name
+            elif body == contact.fixtureB.body:
+                bodyB = name
+            
+        self.contact_db[(bodyA, bodyB)] = len(contact.manifold.points)
+
+    def EndContact(self, contact):
+        for name, body in self.bodies.items():
+            if body == contact.fixtureA.body:
+                bodyA = name
+            elif body == contact.fixtureB.body:
+                bodyB = name
+            
+        self.contact_db[(bodyA, bodyB)] = 0
+
+    def PreSolve(self, contact, oldManifold):
+        pass
+
+    def PostSolve(self, contact, impulse):
+        pass
+
+from IPython.display import Image
+import matplotlib.image as mpimg
+
+plt.ioff()
 # ------------------------------------------------------------------------------
 # ------------------------------------------------------------------------------
 
 
 class Box2DSim(object):
-    """2D physics using box2d and a json conf file"""
-
+    """ 2D physics using box2d and a json conf file
+    """
     @staticmethod
     def loadWorldJson(world_file):
         jsw = json2d.load_json_data(world_file)
         return jsw
 
-    def __init__(
-        self, world_file=None, world_dict=None, dt=1 / 80.0, vel_iters=30, pos_iters=2
-    ):
+    def __init__(self, world_file=None, world_dict=None, dt=1/80.0, vel_iters=30, pos_iters=2):
         """
         Args:
 
@@ -39,15 +75,19 @@ class Box2DSim(object):
             world, bodies, joints = json2d.createWorldFromJson(world_file)
         else:
             world, bodies, joints = json2d.createWorldFromJsonObj(world_dict)
+
+        self.contact_listener = ContactListener(bodies)
+        
         self.dt = dt
         self.vel_iters = vel_iters
         self.pos_iters = pos_iters
         self.world = world
+        self.world.contactListener = self.contact_listener
         self.bodies = bodies
         self.joints = joints
-        self.joint_pids = {
-            ("%s" % k): PID(dt=self.dt) for k in list(self.joints.keys())
-        }
+        self.joint_pids = { ("%s" % k): PID(dt=self.dt)
+                for k in list(self.joints.keys()) }
+
 
     def contacts(self, bodyA, bodyB):
         """Read contacts between two parts of the simulation
@@ -61,13 +101,15 @@ class Box2DSim(object):
 
             (int): number of contacts
         """
+        c1 = 0
+        c2 = 0
+        db =  self.contact_listener.contact_db 
+        if (bodyA, bodyB) in db.keys(): 
+            c1 = self.contact_listener.contact_db[(bodyA, bodyB)]
+        if (bodyB, bodyA) in db.keys(): 
+            c2 = self.contact_listener.contact_db[(bodyB, bodyA)]
 
-        contacts = 0
-        for ce in self.bodies[bodyA].contacts:
-            if ce.contact.touching is True:
-                if ce.contact.fixtureA.body == self.bodies[bodyB]:
-                    contacts += 1
-        return contacts
+        return c1 + c2
 
     def move(self, joint_name, angle):
         """change the angle of a joint
@@ -80,6 +122,15 @@ class Box2DSim(object):
         """
         pid = self.joint_pids[joint_name]
         pid.setpoint = angle
+
+    def step(self):
+        """ A simulation step
+        """
+        for key in list(self.joints.keys()):
+            self.joint_pids[key].step(self.joints[key].angle)
+            self.joints[key].motorSpeed = (self.joint_pids[key].output)
+        self.world.Step(self.dt, self.vel_iters, self.pos_iters)
+
 
     def move_body(self, angle, speed):
         """Move the robot
@@ -105,15 +156,6 @@ class Box2DSim(object):
 
         pid = self.joint_pids["body_to_head"]
         pid.setpoint += 10 * angle
-
-    def step(self):
-        """A simulation step"""
-        for key in list(self.joints.keys()):
-            self.joint_pids[key].step(self.joints[key].angle)
-            self.joints[key].motorSpeed = self.joint_pids[key].output
-        self.world.Step(self.dt, self.vel_iters, self.pos_iters)
-
-
 # ------------------------------------------------------------------------------
 # ------------------------------------------------------------------------------
 

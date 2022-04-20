@@ -28,7 +28,7 @@ for t in range(30000):
 
     #env.render("offline")
     if t%50 == 0:
-        env.render()
+        env.render("human")
     action[-2] += 0.0002*(0.04*rng.randn() - action[-2])   # random angular velocity
     action[-1] += 0.0002*(0.1*rng.randn() - action[-1])  # randomlinear velocity
 

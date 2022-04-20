@@ -100,7 +100,7 @@ class Box2DSimRatEnv(gym.Env):
     def set_renderer_figsize(self, figsize):
         self.renderer_figsize = figsize
 
-    def init_worlds(self):
+    def init_worlds(self):       
         self.world_files = [
             pkg_resources.resource_filename("RatSim", "models/obj1.json"),
             pkg_resources.resource_filename("RatSim", "models/obj2.json"),
@@ -196,17 +196,7 @@ class Box2DSimRatEnv(gym.Env):
                 for sensor_name in self.sensors_names
             ]
         )
-        # sensors += np.array(
-        #     [
-        #         np.sum(
-        #             [
-        #                 self.sim.contacts(sensor_name, part_name)
-        #                 for part_name in self.robot_parts_names
-        #             ]
-        #         )
-        #         for sensor_name in self.sensors_names
-        #     ]
-        # )
+
         obj_pos = np.array(
             [
                 [self.sim.bodies[object_name].worldCenter]
