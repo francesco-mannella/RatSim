@@ -203,7 +203,7 @@ class TestPlotter:
         self.ts = 0
 
         dirname = tempfile.mkdtemp()
-        self.vm = vidManager(self.fig, name="sim", dirname=dirname, duration=100)
+        self.vm = vidManager(self.fig, name="sim", dirname=dirname, duration=400)
 
     def reset(self):
 
