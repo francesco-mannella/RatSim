@@ -195,6 +195,7 @@ class TestPlotter:
         else:
             self.fig = TestPlotter.figure
 
+        self.figsize = figsize
 
         self.ax = None
 
@@ -208,12 +209,13 @@ class TestPlotter:
     def reset(self):
 
         self.fig.clear()
+        self.ax = None
         if self.ax is not None:
             plt.delaxes(self.ax)
         if self.axis_pos is None:
-            plt.subplot(111, aspect="equal")
+           self.ax =  plt.subplot(111, aspect="equal")
         else:
-            plt.subplot(self.axis_pos, aspect="equal")
+            self.ax = plt.subplot(self.axis_pos, aspect="equal")
         self.polygons = {}
         for key in self.env.sim.bodies.keys():
             body =  self.env.sim.bodies[key]
@@ -224,10 +226,10 @@ class TestPlotter:
                 fc=body.color + [1],
                 closed=True) for i in body.fixtures]
             for p in self.polygons[key]:
-                plt.gca().add_artist(p)
+                self.ax.add_artist(p)
 
-        plt.xlim(self.xlim)
-        plt.ylim(self.ylim)
+        self.ax.set_xlim(self.xlim)
+        self.ax.set_ylim(self.ylim)
 
     def onStep(self):
         pass
@@ -261,7 +263,6 @@ class TestPlotter:
             img = Image(open(self.vm.vid_path, 'rb').read())
         else:
             img = self.vm.frames
-
 
         return img
         
