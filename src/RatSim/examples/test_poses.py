@@ -6,7 +6,6 @@ rng = np.random.RandomState(2)
 
 env = gym.make('RatSim-v0')
 env = env.unwrapped
-env.reset(1)
 action = 0.45*np.pi*np.array(
     [1.0,   # head_to_wl1 amp
      0.9,   # head_to_wl2 amp
@@ -25,7 +24,7 @@ action = 0.45*np.pi*np.array(
      0])    # linear velocity
 
 observation = env.reset(0)
-for t in range(30000):
+for t in range(3000):
 
     #env.render("offline")
     if t%50 == 0:
