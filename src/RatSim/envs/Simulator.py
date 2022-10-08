@@ -216,13 +216,15 @@ class TestPlotter:
             plt.subplot(self.axis_pos, aspect="equal")
         self.polygons = {}
         for key in self.env.sim.bodies.keys():
-            self.polygons[key] = Polygon(
+            body =  self.env.sim.bodies[key]
+            self.polygons[key] = [
+                    Polygon(
                 [[0, 0]],
-                ec=self.env.sim.bodies[key].color + [1],
-                fc=self.env.sim.bodies[key].color + [1],
-                closed=True)
-
-            plt.gca().add_artist(self.polygons[key])
+                ec=body.color + [1],
+                fc=body.color + [1],
+                closed=True) for i in body.fixtures]
+            for p in self.polygons[key]:
+                plt.gca().add_artist(p)
 
         plt.xlim(self.xlim)
         plt.ylim(self.ylim)
@@ -236,10 +238,11 @@ class TestPlotter:
         ##self.reset()
         for key in self.polygons:
             body = self.env.sim.bodies[key]
-            vercs = np.vstack(body.fixtures[0].shape.vertices)
-            data = np.vstack([body.GetWorldPoint(vercs[x])
-                              for x in range(len(vercs))])
-            self.polygons[key].set_xy(data)
+            for i, fix in enumerate(body.fixtures):
+                vercs = np.vstack(fix.shape.vertices)
+                data = np.vstack([body.GetWorldPoint(vercs[x])
+                                for x in range(len(vercs))])
+                self.polygons[key][i].set_xy(data)
 
         self.onStep()
 
