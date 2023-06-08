@@ -145,7 +145,6 @@ class Box2DSimRatEnv(gym.Env):
             self.world_id = world_id
         self.choose_worldfile(world_id)
         self.object_names = self.world_object_names[self.world_id]
-        print(self.world_file)
 
         world_dict = Sim.loadWorldJson(self.world_file)
         world_dict = self.randomize_objects(world_dict, self.noise)
