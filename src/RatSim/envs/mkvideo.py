@@ -60,11 +60,14 @@ class vidManager:
             name = self.name
         if dirname is None:
             dirname = self.dirname
+
+        self.vid_path = dirname + os.sep + name + '.gif'
         self.frames[0].save(dirname + os.sep + name + '.gif',
                        format='GIF',
                        append_images=self.frames[1:],
                        save_all=True,
                        duration=self.duration, loop=0)
+
 
 
 if __name__ == "__main__":
