@@ -32,12 +32,7 @@ class vidManager:
         Clear all stuff within the folder (create it if needed)
         """
         self.t = 0
-        if not os.path.exists(self.dirname):
-            os.makedirs(self.dirname)
-        files = glob.glob(self.dirname + os.sep + "*.png")
-        for f in files:
-            if(os.path.isfile(f)):
-                os.remove(f)
+        self.frames = []
 
     def save_frame(self):
         """
@@ -45,7 +40,13 @@ class vidManager:
         """
 
         self.fig.canvas.draw()
-        self.fig.savefig(self.dirname + os.sep + self.name + "%08d.png" % self.t, dpi=300)
+        
+        frame = Image.frombytes('RGB', 
+         self.fig.canvas.get_width_height(), 
+         self.fig.canvas.tostring_rgb())
+
+        self.frames.append(frame)
+
         self.t += 1
 
     def mk_video(self, name=None, dirname=None):
@@ -53,30 +54,20 @@ class vidManager:
         Make a gif file from saved frames. the gif file will be in
         <self.dirname>/<self.name>.gif
         """
-        # Create the frames
-        self.frames = []
-        imgs = glob.glob(self.dirname + os.sep + self.name + "*.png")
-        for i in sorted(imgs):
-            new_frame = Image.open(i)
-            self.frames.append(new_frame.copy())
-            new_frame.close()
-
         # Save into a GIF file that loops forever
 
         if name is None:
             name = self.name
         if dirname is None:
             dirname = self.dirname
-        
+
         self.vid_path = dirname + os.sep + name + '.gif'
-        
-        self.frames[0].save(self.vid_path,
+        self.frames[0].save(dirname + os.sep + name + '.gif',
                        format='GIF',
                        append_images=self.frames[1:],
                        save_all=True,
                        duration=self.duration, loop=0)
-        
-        
+
 
 
 if __name__ == "__main__":

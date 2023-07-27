@@ -49,10 +49,10 @@ for t in range(stime):
     action[:6] = amplitudes
 
     # rotation velocity
-    action[-2] = 0.01*angles[t]
+    action[-2] = 0.05*angles[t]
 
     # linear velocity
-    action[-1] = 0.01*speeds[t]
+    action[-1] = 0.00*speeds[t]
 
     state, *_ = env.step(action)
     

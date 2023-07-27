@@ -283,14 +283,15 @@ class Box2DSimRatEnv(gym.Env):
             np.zeros(2 * (self.num_joints - 1) + 1 + self.num_move_degrees)
         )
 
-    def render(self, mode="human"):
+
+    def set_renderer(self, mode="human", hard=False):
 
         if self.renderer is not None:
             if (mode == "human" and self.renderer.offline == True) or \
                 (mode == "offline" and self.renderer.offline == False): 
                     self.renderer = None
 
-        if self.renderer is None:
+        if self.renderer is None or hard == True:
             if mode == "human":
                 self.renderer = self.rendererType(
                     self,
@@ -312,5 +313,7 @@ class Box2DSimRatEnv(gym.Env):
                     axis_pos=self.renderer_axis,
                 )
 
+    def render(self, mode="human"):
+        self.set_renderer(mode)
         self.renderer.step()
 

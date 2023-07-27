@@ -208,14 +208,11 @@ class TestPlotter:
 
     def reset(self):
 
-        self.fig.clear()
-        self.ax = None
-        if self.ax is not None:
-            plt.delaxes(self.ax)
+        if self.ax is not None: self.fig.delaxes(self.ax)
         if self.axis_pos is None:
-           self.ax =  plt.subplot(111, aspect="equal")
+           self.ax =  self.fig.add_subplot(111, aspect="equal")
         else:
-            self.ax = plt.subplot(self.axis_pos, aspect="equal")
+            self.ax = self.fig.add_subplot(self.axis_pos, aspect="equal")
         self.polygons = {}
         for key in self.env.sim.bodies.keys():
             body =  self.env.sim.bodies[key]
@@ -247,7 +244,8 @@ class TestPlotter:
                 self.polygons[key][i].set_xy(data)
 
         self.onStep()
-
+        
+        self.fig.canvas.flush_events()
         self.fig.canvas.draw()
         if self.offline == True:
             self.vm.save_frame()
