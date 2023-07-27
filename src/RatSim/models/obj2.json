@@ -23,34 +23,6 @@
       "type": 2,
       "fixture": [
         {
-          "density": 4000,
-          "group_index": 1,
-          "polygon": {
-            "vertices": {
-              "x": [
-                -3.4,
-                -3.4,
-                0,
-                0.5,
-                3.4,
-                3.4,
-                -3.4
-              ],
-              "y": [
-                -2,
-                1.2,
-                1.2,
-                2,
-                2,
-                -2,
-                -2
-              ]
-            }
-          }
-        }
-      ]
-      "fixture": [
-        {
           "density": 40000,
           "group_index": 1,
           "polygon": {
